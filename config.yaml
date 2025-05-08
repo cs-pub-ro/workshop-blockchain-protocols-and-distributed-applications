@@ -1,6 +1,6 @@
 stages:
-  - make_assets
-  - embed_reveal
+  # - make_assets
+  # - embed_reveal
   - docusaurus
 
 build_dir: /build
@@ -47,7 +47,7 @@ docusaurus:
     sidebar: js
     structure:
       - Introduction: chapters/README.md
-      - Lectures:
+      # - Lectures:
         # - Introduction: /build/embed_reveal/Introduction/Introduction.mdx
             # - Blockchain Protocols: Blockchain-Protocols/Blockchain-Protocols.mdx
             # - Case Study: Case-Study/Case-Study.mdx
