@@ -26,3 +26,8 @@ While there are no strict prerequisites for this course, a basic understanding o
 - Students interested in blockchain technology and its applications.
 - Developers and professionals looking to enhance their skills in blockchain development.
 - Anyone curious about the future of decentralized and secure systems.
+
+## Lectures
+
+- https://docs.google.com/presentation/d/e/2PACX-1vTWCBXFsF66VD13YjGSKXGhw0gpCeE43mYu38WRAypvl-dI9mvE5Go6mEmwTyPigq0JHA8VoPUFcObt/pub?start=false&loop=false&delayms=3000
+- 
