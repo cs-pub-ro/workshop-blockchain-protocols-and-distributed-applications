@@ -1,25 +1,21 @@
----
-slug: /
----
+# Blockchain Protocols and Distributed Applications Workshop
 
-# Blockchain Protocols and Distributed Applications
-
-Welcome to the course on Blockchain Protocols and Distributed Applications.
-This course will provide you with a comprehensive understanding of blockchain technology and its applications in various domains.
+Welcome toBlockchain Protocols and Distributed Applications Workshop!
+This workshop will provide you with a comprehensive understanding of blockchain technology and its applications in various domains.
 
 ## Course Overview
 
-In this course, you will explore the following key topics:
+In this workshop, you will explore the following key topics:
 
 - Introduction to Blockchain Technology
 - Blockchain Protocols and Consensus Mechanisms
-- Virtual Machines in Blockchains
 - Wallets
+- Tokens & NFTs
 - Smart Contracts
 - DApps (Decentralized Applications)
-- Security in Blockchains
-- MultiversX and Rust Programming
-- Blockchain Use Cases in Finance and more
+- Ethereum, Arbitrum, MultiversX
+- Liquidity Pools, Decentralized Exchanges
+- Blockchain Use Cases in Finance (DeFi)
 
 ## Prerequisites
 
