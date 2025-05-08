@@ -62,18 +62,6 @@ docusaurus:
               path: chapters/introduction/lab/content/setup
               subsections:
                 - Setting up the Lab Environment: setup.md
-          - Wallet:
-              path: chapters/introduction/lab/content/wallet
-              extra:
-                - ../../media/
-              subsections:
-                - Cmd line wallet/: cmdline_wallet.md
-                - Wallet/: wallet.md
-                - Keystore/: keystore.md
-                - Access & Faucet: faucet.md
-                - Send Transaction: send_tx.md
-                - Browser Web Wallet: browser_wallet.md
-                # - Observer: observer.md
           - Explorer:
               path: chapters/introduction/lab/content/explorer
               extra:
@@ -97,6 +85,18 @@ docusaurus:
                 - NFT: nft.md
               extra:
                 - ../media/
+          - Wallet:
+              path: chapters/introduction/lab/content/wallet
+              extra:
+                - ../../media/
+              subsections:
+                - Cmd line wallet/: cmdline_wallet.md
+                - Wallet/: wallet.md
+                - Keystore/: keystore.md
+                - Access & Faucet: faucet.md
+                - Send Transaction: send_tx.md
+                - Browser Web Wallet: browser_wallet.md
+                # - Observer: observer.md
           - Smart Contracts:
               path: chapters/smart-contracts/lab/content
               subsections:
