@@ -163,7 +163,7 @@ docusaurus:
                 - Sources : sources.md
               extra:
                 - ../media/
-      - Assignments:
+      # - Assignments:
           # - Assignment 1: assignments/assignment1.md
           # - Assignment 2: assignments/assignment2.md
           # - Project: assignments/project.md
