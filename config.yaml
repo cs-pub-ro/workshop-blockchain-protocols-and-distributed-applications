@@ -58,10 +58,6 @@ docusaurus:
             # - Scaling dApps: Scaling-dApps/Scaling-dApps.mdx
             # - Composability: Composability/Composability.mdx
       - Practical Sessions:
-          - Env Setup:
-              path: chapters/introduction/lab/content/setup
-              subsections:
-                - Setting up the Lab Environment: setup.md
           - Explorer:
               path: chapters/introduction/lab/content/explorer
               extra:
@@ -85,7 +81,7 @@ docusaurus:
                 - NFT: nft.md
               extra:
                 - ../media/
-          - Wallet:
+          - MultiversX Wallet:
               path: chapters/introduction/lab/content/wallet
               extra:
                 - ../../media/
@@ -110,6 +106,10 @@ docusaurus:
                 - Neversea SC: neversea.md
               extra:
                 - ../media/
+          - MultiversX Env Setup:
+              path: chapters/introduction/lab/content/setup
+              subsections:
+                - Setting up the Lab Environment: setup.md
           - Learning Rust:
               path: chapters/rust/content
               subsections:
