@@ -65,7 +65,7 @@ docusaurus:
                 # - ../../quiz/
               subsections:
                 - Metamask Intro/: metamask.md
-                - Metamask Network Config/: metamask_config_network.md
+                - Metamask Network Config/: metamask_config_networks.md
                 - Metamask Transaction/: metamask_transaction.md
           - Explorer:
               path: chapters/introduction/lab/content/explorer
