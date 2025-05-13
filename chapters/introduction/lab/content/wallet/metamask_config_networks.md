@@ -48,11 +48,15 @@ For Arbitrum or Base networks:
 
 ## Getting Test Funds
 
+
+**Note!** You will need to add some funds to your Mainnet account in order to claim test tokens. You can do so on your own or, for this workshop, you can send us your new address and we will send you some tokens back.
+
+
 For workshop exercises, you'll need test ETH:
 
-1. For Sepolia: Use [Sepolia Faucet](https://sepoliafaucet.com/)
-2. For Arbitrum Sepolia: Use [Arbitrum Faucet](https://faucet.quicknode.com/arbitrum/sepolia)
-3. For Base Sepolia: Use [Base Faucet](https://www.coinbase.com/faucets/base-sepolia-faucet)
+1. For Sepolia: Use [Sepolia Faucet](https://sepoliafaucet.com/) or [ChainLink Faucet](https://faucets.chain.link/sepolia);
+2. For Arbitrum Sepolia: Use [Arbitrum Faucet](https://faucet.quicknode.com/arbitrum/sepolia);
+3. For Base Sepolia: Use [Base Faucet](https://www.coinbase.com/faucets/base-sepolia-faucet).
 
 ## Security Best Practices
 
