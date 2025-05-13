@@ -57,7 +57,16 @@ docusaurus:
             # - Security: Security/Security.mdx
             # - Scaling dApps: Scaling-dApps/Scaling-dApps.mdx
             # - Composability: Composability/Composability.mdx
-      - Practical Sessions:
+      - Practical Sessions: 
+          - Explorer:
+              path: chapters/introduction/lab/content/wallet
+              extra:
+                - ../../media/
+                # - ../../quiz/
+              subsections:
+                - Metamask Intro/: metamask.md
+                - Metamask Network Config/: metamask_config_network.md
+                - Metamask Transaction/: metamask_transaction.md
           - Explorer:
               path: chapters/introduction/lab/content/explorer
               extra:
