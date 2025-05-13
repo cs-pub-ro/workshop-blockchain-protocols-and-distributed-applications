@@ -62,3 +62,4 @@ Your wallet is now set up! You should see a screen with:
 - [MetaMask Official Documentation](https://support.metamask.io)
 - [Ethereum Developer Documentation](https://ethereum.org/developers)
 - [Workshop Repository](https://github.com/cs-pub-ro/workshop-blockchain-protocols-and-distributed-applications)
+- [Tutorial Video în Română](https://youtu.be/NRaMPZ8U5Is?si=Jk84BZmhw7lWgk49)
