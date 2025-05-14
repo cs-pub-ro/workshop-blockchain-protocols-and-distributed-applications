@@ -67,6 +67,18 @@ docusaurus:
                 - Intro & Installing MetaMask/: metamask.md
                 - Metamask Network Config/: metamask_config_networks.md
                 - Metamask Transaction/: metamask_transaction.md
+          - MultiversX Wallet:
+              path: chapters/introduction/lab/content/wallet
+              extra:
+                - ../../media/
+              subsections:
+                - Cmd line wallet/: cmdline_wallet.md
+                - Wallet/: wallet.md
+                - Keystore/: keystore.md
+                - Access & Faucet: faucet.md
+                - Send Transaction: send_tx.md
+                - Browser Web Wallet: browser_wallet.md
+                # - Observer: observer.md
           - Explorer:
               path: chapters/introduction/lab/content/explorer
               extra:
@@ -90,18 +102,15 @@ docusaurus:
                 - NFT: nft.md
               extra:
                 - ../media/
-          - MultiversX Wallet:
-              path: chapters/introduction/lab/content/wallet
+          - DeFi:
+              path: chapters/money/lab/content/
               extra:
-                - ../../media/
+                - ../media/
               subsections:
-                - Cmd line wallet/: cmdline_wallet.md
-                - Wallet/: wallet.md
-                - Keystore/: keystore.md
-                - Access & Faucet: faucet.md
-                - Send Transaction: send_tx.md
-                - Browser Web Wallet: browser_wallet.md
-                # - Observer: observer.md
+                - Liquidity Pools Intro: liquidity_pools.md
+                - Liquidity Pools Use Cases: liquidity_pools_use_cases.md 
+                - ESDT Tokens: mint_tokens.md
+                - Swap Tokens: swap.md
           - Smart Contracts:
               path: chapters/smart-contracts/lab/content
               subsections:
@@ -137,13 +146,6 @@ docusaurus:
                 - SC Events: events.md
               extra:
                 - ../media/
-          - DeFi:
-              path: chapters/money/lab/content/
-              extra:
-                - ../media/
-              subsections:
-                - ESDT Tokens: mint_tokens.md
-                - Swap Tokens: swap.md
           - CTF:
               path: chapters/ctf/
               subsections:
