@@ -1,4 +1,5 @@
-# Mint tokens
+# Mint tokens on MultiversX
+
 
 In this section you will learn how to mint tokens on MultiversX.
 

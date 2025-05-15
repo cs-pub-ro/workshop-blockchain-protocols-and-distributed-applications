@@ -95,8 +95,9 @@ docusaurus:
               subsections:
                 - Standards: standards.md
                 - Fungible & NonFugible Tokens: fungible-non-fungible.md
-                - Fungible: fungible.md
-                - NFT: non-fungible.md
+                - Ethereum Fungible Token: mint_tokens_eth.md
+                - MultiversX Fungible Token: fungible.md
+                - MultiversX NFT: non-fungible.md
               extra:
                 - ../media/
           - DeFi:
@@ -106,8 +107,10 @@ docusaurus:
               subsections:
                 - Liquidity Pools Intro: liquidity_pools.md
                 - Liquidity Pools Use Cases: liquidity_pools_use_cases.md 
-                - ESDT Tokens: mint_tokens.md
-                - Swap Tokens: swap.md
+                - MultiversX ESDT Tokens: mint_tokens_mvx.md
+                - Ethereum Fungible Token: mint_tokens_eth.md
+                - Swap Ethereum Tokens: swap_eth.md
+                - Swap MultiversX Tokens: swap_mvx.md
           # - Smart Contracts:
           #     path: chapters/smart-contracts/lab/content
           #     subsections:
