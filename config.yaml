@@ -72,13 +72,10 @@ docusaurus:
               extra:
                 - ../../media/
               subsections:
-                - Cmd line wallet/: cmdline_wallet.md
                 - Wallet/: wallet.md
-                - Keystore/: keystore.md
                 - Access & Faucet: faucet.md
                 - Send Transaction: send_tx.md
-                - Browser Web Wallet: browser_wallet.md
-                # - Observer: observer.md
+                - Browser Web Wallet (Optional): browser_wallet.md
           - Explorer:
               path: chapters/introduction/lab/content/explorer
               extra:
