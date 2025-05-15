@@ -107,6 +107,7 @@ docusaurus:
               subsections:
                 - Liquidity Pools Intro: liquidity_pools.md
                 - Liquidity Pools Use Cases: liquidity_pools_use_cases.md 
+                - Liquidity Pool Ethereum: lp_eth.md
                 - MultiversX ESDT Tokens: mint_tokens_mvx.md
                 - Ethereum Fungible Token: mint_tokens_eth.md
                 - Swap Ethereum Tokens: swap_eth.md
