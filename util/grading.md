@@ -2,7 +2,7 @@
 
 | Section    | Percent of total grade |
 | -------- | ------- |
-| Attendance | 40p |
+| Attendance (Arbitrum - Ethereum SC bridge interaction) | 40p |
 | Arbitrum Token Creations| 10p |
 | MultiversX Transaction | 10p |
 | MultiversX Token Creation | 10p |

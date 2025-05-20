@@ -1,4 +1,4 @@
-# Register Your Classroom Attendance (40p)
+# Attendance (Arbitrum - Ethereum SC bridge interaction) (40p)
 
 Objective: You need to register as class attendant with your name and wallet on Ethereum Sepolia. Use your FirstName and the first initial of the LastName.
 

@@ -1,0 +1,7 @@
+/Users/costincarabas/facultate/didactic/workshop-bpda.git/util/attendance/target/debug/deps/libnibble_vec-16c42770e43915b0.rmeta: /Users/costincarabas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/nibble_vec-0.1.0/src/lib.rs
+
+/Users/costincarabas/facultate/didactic/workshop-bpda.git/util/attendance/target/debug/deps/libnibble_vec-16c42770e43915b0.rlib: /Users/costincarabas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/nibble_vec-0.1.0/src/lib.rs
+
+/Users/costincarabas/facultate/didactic/workshop-bpda.git/util/attendance/target/debug/deps/nibble_vec-16c42770e43915b0.d: /Users/costincarabas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/nibble_vec-0.1.0/src/lib.rs
+
+/Users/costincarabas/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/nibble_vec-0.1.0/src/lib.rs:
