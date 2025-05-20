@@ -147,10 +147,11 @@ docusaurus:
           #       - SC Events: events.md
           #     extra:
           #       - ../media/
-          - CTF:
+          - Challenges:
               path: chapters/ctf/
               subsections:
-                - Challenge: workshop.md
+                - Classroom Registration: workshop.md
+                - MultiversX Wallet: multiversx_wallet.md
                 # - Bump: bump.md
                 # - Coinflip: coinflip.md
                 # - GassPass: gaspass.md

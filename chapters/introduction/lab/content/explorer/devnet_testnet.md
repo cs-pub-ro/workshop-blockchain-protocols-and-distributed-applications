@@ -5,7 +5,7 @@ While developing applications, there is a need for a development/testing blockch
 Inspect:
 * [MultiversX Testnet Explorer](https://testnet-explorer.multiversx.com/)
 * [MultiversX Devnnet Explorer](https://devnet-explorer.multiversx.com/)
-* [Goerli Ethereum Testnet Explorer](https://goerli.etherscan.io/)
+* [Arbitrum Testnet Explorer](https://sepolia.arbiscan.io/)
 * [Sepolia Ethereum Testnet Explorer](https://sepolia.etherscan.io/)
 
 What differences can you observe?
