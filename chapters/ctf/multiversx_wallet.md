@@ -23,7 +23,7 @@ You can check the [MultiversX Wallet](https://cs-pub-ro.github.io/workshop-block
 
 ## Create a Liquidity Pool (10p)
 
-**Objective:** You need to create a Liquidity Pool on [xExchange](https://devnet.xexchange.com/), and make a transfer of that NFT to our account: `erd1mqa9wttlzwwdvwgk9dzsfdn79lv5raw0tfe9ynvn0dg92hpruvaqhhd2gx`.
+**Objective:** You need to create a Liquidity Pool on [xExchange](https://devnet.xexchange.com/).
 
 
 **Hint:** You can use the [Pools](https://devnet.xexchange.com/explore/pools) https://devnet.xexchange.com/explore/pools.
