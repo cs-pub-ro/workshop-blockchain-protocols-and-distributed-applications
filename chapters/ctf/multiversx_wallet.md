@@ -33,4 +33,6 @@ You can check the [MultiversX Wallet](https://cs-pub-ro.github.io/workshop-block
 
 **Objective:** You need to make a trade with your newly created token. 
 
+**Please submit your MultiversX wallet on the Google Form**.
+
 **Hint:** If the liquidity pools is created, you can now use the [Exchange](https://devnet.xexchange.com/) to performs trades.
