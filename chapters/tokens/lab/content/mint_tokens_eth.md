@@ -37,4 +37,5 @@ You should see the tokens in your wallet.
 ## Practice
 
 * Create your own ESDT token;
-* Inspect the transaction.
+* Inspect the transaction;
+* You can also use [this link](https://tokentool.bitbond.com/create-token/erc20-token/arbitrum-sepolia).
