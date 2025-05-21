@@ -6,9 +6,5 @@ Please check the [Challenges section](https://cs-pub-ro.github.io/workshop-block
 | -------- | ------- |
 | Attendance (Arbitrum - Ethereum SC bridge interaction) | 40p |
 | Arbitrum Token Creations| 10p |
-| MultiversX Transaction | 10p |
-| MultiversX Token Creation | 10p |
-| MultiversX NFT Creation | 10p |
-| MultiversX Liquidity Pool Creation | 10p |
-| MultiversX Trade | 10p |
+| MultiversX Tasks | 50p |
 | **Total** | **100p** |
