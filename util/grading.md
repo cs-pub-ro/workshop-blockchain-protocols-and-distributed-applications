@@ -12,8 +12,9 @@ Please check the [Challenges section](https://cs-pub-ro.github.io/workshop-block
 | **Total with Bonus** | **130p** |
 
 <sup>1</sup> perform the wallet creation, token creation, liquidity pool, swaps on MultiversX Mainnet:
-* https://wallet.multiversx.com/
-* https://explorer.multiversx.com/
-* https://xexchange.com/
+
+1. https://wallet.multiversx.com/
+2. https://explorer.multiversx.com/
+3. https://xexchange.com/
 
 <sup>2</sup> If you want to perform this task we can send you some funds (EGLD) on mainnet.
