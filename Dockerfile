@@ -16,7 +16,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
 RUN npm install -g reveal-md
 
 # Install Docusaurus.
-RUN npm install create-docusaurus@2
+RUN npm install create-docusaurus@latest @docusaurus/preset-classic@latest
 
 WORKDIR /content
 
