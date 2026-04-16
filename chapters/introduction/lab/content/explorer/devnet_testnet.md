@@ -3,14 +3,14 @@
 While developing applications, there is a need for a development/testing blockchain.
 
 Inspect:
-* [MultiversX Testnet Explorer](https://testnet-explorer.multiversx.com/)
-* [MultiversX Devnnet Explorer](https://devnet-explorer.multiversx.com/)
-* [Arbitrum Testnet Explorer](https://sepolia.arbiscan.io/)
+
 * [Sepolia Ethereum Testnet Explorer](https://sepolia.etherscan.io/)
+* [Arbitrum Testnet Explorer](https://sepolia.arbiscan.io/)
+* [MultiversX Devnnet Explorer](https://devnet-explorer.multiversx.com/)
 
 What differences can you observe?
 
-These blockchains offer the `Faucet` option where you can mint blockchain tokens (eGLD, ETH, etc.).
+These blockchains offer the `Faucet` option where you can mint blockchain tokens (ETH, eGLD, etc.).
 This way the development is easier for the community.
 
 ---

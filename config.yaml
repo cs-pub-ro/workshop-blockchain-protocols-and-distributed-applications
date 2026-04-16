@@ -76,10 +76,11 @@ docusaurus:
                 - Time in Blockchain/: time.md
                 - Blocks/: blocks.md
                 - Block Leader/: leader.md
-                - Consensus Grup/: consensus.md
+                # - Consensus Grup/: consensus.md
                 - Transactions/: transactions.md
                 - Blockchain Validators/: validators.md
-                - Blockchain Observers/: observers.md
+                # TODO
+                # - Blockchain Observers/: observers.md
                 - Devnet Blockchains/: devnet_testnet.md
           - Tokens:
               path: chapters/tokens/lab/content

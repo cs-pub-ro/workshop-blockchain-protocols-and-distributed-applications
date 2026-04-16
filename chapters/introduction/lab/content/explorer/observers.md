@@ -1,7 +1,7 @@
 # Blockchain Observers
 
 Observers are a type of nodes that `don't participate in the consensus` but keep a peer-to-peer communication with the rest of the blockchain.
-They are usually used to see the communication between nodes (ex: debugging). 
+They are usually used to see the communication between nodes (ex: debugging).
 
 Let's filter the nodes to see only the observers. There is an [Observers](https://explorer.multiversx.com/nodes?type=observer) tab below the `Nodes` section.
 
