@@ -1,9 +1,9 @@
 # Consensus Group
 
-We will continue with the same [block](https://explorer.multiversx.com/blocks/cec3654a58245c7b548ffdb56254107b3a3a46903b5d191cf67ff126eaa17111) from the previous section (Block Height: 16826695).
+We will continue with the same [block](https://etherscan.io/block/24892306) from the previous section (Block Height: 24892306).
 
 Observe the field **Consensus Group**:
-![Leader](../../media/leader.png)
+![Leader](../../media/eth_proposal.png)
 
 There are 63 validators which execute every transaction in this block.
 If you click on the **63 validators (See all)** button you will see 63 public keys, which are links to all the 63 nodes that participated in consensus.

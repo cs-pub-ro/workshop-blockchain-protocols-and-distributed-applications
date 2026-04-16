@@ -6,57 +6,84 @@ For the workshop, we'll need to connect to various networks:
 
 ### Ethereum Testnets
 
-1. Click on the network dropdown at the top of MetaMask (initially says "Ethereum Mainnet")
-2. Select "Sepolia Test Network" or "Goerli Test Network"
-   - If you don't see these options, click "Show/hide test networks" in Settings > Advanced and enable test networks
+1. Click the menu in the top-right corner and select `Networks`
+2. Scroll down and toggle *Show test networks* at the bottom of the network list
+3. To keep a specific testnet (like Sepolia) easily accessible, click the 3 vertical dots next to the network's name, select *Edit*, and then click *Save*.
+
+For more detailed instructions, you can access the [How to view testnets in MetaMask](https://support.metamask.io/configure/networks/how-to-view-testnets-in-metamask/).
+
+After you've completed these steps, your wallet should look like the example below:
+
+![img](../../media/metamask_testing_env.png)
 
 ### Adding Other Networks
 
 For Arbitrum or Base networks:
 
-1. Click on the network dropdown
-2. Click "Add network"
-3. Choose from popular networks or add manually with the following details:
+1. Click the menu in the top-right corner and select `Networks`
+2. Choose from popular networks.
 
-#### Arbitrum One
-- Network Name: Arbitrum One
-- RPC URL: https://arb1.arbitrum.io/rpc
+Let's add Arbitrum and Base. If you click on Edit, you will see its charactheristics.
+
+For Arbitrum Network you will see:
+
+- Network Name: Arbitrum
+- RPC URL: <https://arb1.arbitrum.io/rpc>
 - Chain ID: 42161
 - Currency Symbol: ETH
-- Block Explorer URL: https://arbiscan.io
+- Block Explorer URL: <https://arbiscan.io>
 
-#### Arbitrum Sepolia (Testnet)
-- Network Name: Arbitrum Sepolia
-- RPC URL: https://sepolia-rollup.arbitrum.io/rpc
-- Chain ID: 421614
-- Currency Symbol: ETH
-- Block Explorer URL: https://sepolia.arbiscan.io/
+For Base Network you will see:
 
-#### Base
 - Network Name: Base
-- RPC URL: https://mainnet.base.org
+- RPC URL: <https://base-mainnet.infura.io>
 - Chain ID: 8453
 - Currency Symbol: ETH
-- Block Explorer URL: https://basescan.org
+- Block Explorer URL: <https://basescan.org>
+
+You can also add a custom network by clicking "Add a custom network" button at the bottom center. Let's add manually the next networks with the following details:
+
+#### Arbitrum Sepolia (Testnet)
+
+- Network Name: Arbitrum Sepolia
+- RPC URL: <https://sepolia-rollup.arbitrum.io/rpc>
+- Chain ID: 421614
+- Currency Symbol: ETH
+- Block Explorer URL: <https://sepolia.arbiscan.io/>
 
 #### Base Sepolia (Testnet)
+
 - Network Name: Base Sepolia
-- RPC URL: https://sepolia.base.org
+- RPC URL: <https://sepolia.base.org>
 - Chain ID: 84532
 - Currency Symbol: ETH
-- Block Explorer URL: https://sepolia.basescan.org
+- Block Explorer URL: <https://sepolia.basescan.org>
 
 ## Getting Test Funds
 
+A faucet is an application that dispenses free tokens on a testnet. These tokens allow you to experiment with the testnet.
 
-**Note!** You will need to add some funds to your Mainnet account in order to claim test tokens. You can do so on your own or, for this workshop, you can send us your new address and we will send you some tokens back.
+Many testnet environments require your wallet address to hold some real funds on the Mainnet before you can use their faucets. However, by using the [Google Cloud Web3 Faucet](https://cloud.google.com/application/web3/faucet), you can bypass this requirement and claim test tokens even with an empty wallet.
 
+>[!NOTE]
+> Not all testnet networks are integreated in the *Google Cloud Web3 Faucet* service
 
-For workshop exercises, you'll need test ETH:
+>[!IMPORTANT]
+> The faucet functionality is limited to one use per network, per Google account, every 24 hours. If you claim tokens and then try to use the same Google account to fund a different wallet address within that 24-hour window, it will not work.
 
-1. For Sepolia: Use [Sepolia Faucet](https://sepoliafaucet.com/) or [ChainLink Faucet](https://faucets.chain.link/sepolia);
-2. For Arbitrum Sepolia: Use [Arbitrum Faucet](https://faucet.quicknode.com/arbitrum/sepolia);
-3. For Base Sepolia: Use [Base Faucet](https://www.coinbase.com/faucets/base-sepolia-faucet).
+For workshop exercises, you'll need test ETH for Sepolia:
+
+1. Navigate to the [Google Cloud Web3 Faucet](https://cloud.google.com/application/web3/faucet) portal.
+2. Select the network: Ethereum Sepolia.
+3. Enter your Ethereum wallet address from MetaMask (the string of characters copied from your wallet that starts with `0x...`).
+4. Complete the process to request the funds.
+
+To verify the transaction, click the Transaction Hash [link](https://sepolia.etherscan.io). You will be redirected to the single transfer transaction showing an amount of 0.05 ETH.
+
+Now, Metamask will have the next output:
+
+![img](../../media/faucet_metamask.png)
+
 
 ## Security Best Practices
 
@@ -86,13 +113,14 @@ Common issues and solutions:
    - Try a different RPC URL for the network
 
 ## Next Steps
-
+<!-- 
 Now that you have MetaMask installed and configured:
+
 - Try sending a small amount of test ETH between accounts
 - Explore block explorers to track your transactions
-- Connect to a simple dApp to understand the connection process
+- Connect to a simple dApp to understand the connection process -->
 
-In the next section of the workshop, we'll use MetaMask to deploy and interact with smart contracts on the Ethereum testnet.
+In the next section of the workshop, we'll use MetaMask to send a small amount of test ETH between accounts
 
 ## Resources
 

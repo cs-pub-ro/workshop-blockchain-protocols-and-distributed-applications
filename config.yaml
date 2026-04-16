@@ -67,15 +67,6 @@ docusaurus:
                 - Intro & Installing MetaMask/: metamask.md
                 - Metamask Network Config/: metamask_config_networks.md
                 - Metamask Transaction/: metamask_transaction.md
-          - MultiversX Wallet:
-              path: chapters/introduction/lab/content/wallet
-              extra:
-                - ../../media/
-              subsections:
-                - Wallet/: wallet.md
-                - Access & Faucet: faucet.md
-                - Send Transaction: send_tx.md
-                - Browser Web Wallet (Optional): browser_wallet.md
           - Explorer:
               path: chapters/introduction/lab/content/explorer
               extra:
@@ -85,10 +76,10 @@ docusaurus:
                 - Time in Blockchain/: time.md
                 - Blocks/: blocks.md
                 - Block Leader/: leader.md
-                - Consensus Grup/: consensus.md
+                # - Consensus Grup/: consensus.md
                 - Transactions/: transactions.md
                 - Blockchain Validators/: validators.md
-                - Blockchain Observers/: observers.md
+                # - Blockchain Observers/: observers.md
                 - Devnet Blockchains/: devnet_testnet.md
           - Tokens:
               path: chapters/tokens/lab/content
@@ -112,6 +103,15 @@ docusaurus:
                 - Ethereum Fungible Token: mint_tokens_eth.md
                 - Swap Ethereum Tokens: swap_eth.md
                 - Swap MultiversX Tokens: swap_mvx.md
+          - MultiversX Wallet (Optional):
+              path: chapters/introduction/lab/content/wallet
+              extra:
+                - ../../media/
+              subsections:
+                - Wallet/: wallet.md
+                - Access & Faucet: faucet.md
+                - Send Transaction: send_tx.md
+                - Browser Web Wallet (Optional): browser_wallet.md
           # - Smart Contracts:
           #     path: chapters/smart-contracts/lab/content
           #     subsections:
