@@ -1,4 +1,4 @@
-FROM ghcr.io/open-education-hub/openedu-builder:0.5.1
+FROM ghcr.io/open-education-hub/openedu-builder:0.6.1
 
 # Install tools.
 RUN apt-get update && \
@@ -16,7 +16,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
 RUN npm install -g reveal-md
 
 # Install Docusaurus.
-RUN npm install create-docusaurus@v2.0.0
+RUN npm install create-docusaurus@v2.1.0
 
 WORKDIR /content
 
