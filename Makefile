@@ -1,5 +1,5 @@
 REPO_NAME = oer-template
-IMAGE_NAME = $(REPO_NAME)/docusaurus:latest
+IMAGE_NAME = $(REPO_NAME)/docusaurus:v2.1.0
 CONTAINER_NAME = open-edu-hub-$(REPO_NAME)-bash
 OUTPUT_DIR = $$PWD/.output/$(REPO_NAME)
 
