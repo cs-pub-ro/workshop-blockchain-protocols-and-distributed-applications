@@ -6,7 +6,7 @@ Inspect:
 
 * [Sepolia Ethereum Testnet Explorer](https://sepolia.etherscan.io/)
 * [Arbitrum Testnet Explorer](https://sepolia.arbiscan.io/)
-* [MultiversX Devnnet Explorer](https://devnet-explorer.multiversx.com/)
+* [MultiversX Devnet Explorer](https://devnet-explorer.multiversx.com/)
 
 What differences can you observe?
 

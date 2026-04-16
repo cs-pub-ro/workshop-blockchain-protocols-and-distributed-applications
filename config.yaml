@@ -79,7 +79,6 @@ docusaurus:
                 # - Consensus Grup/: consensus.md
                 - Transactions/: transactions.md
                 - Blockchain Validators/: validators.md
-                # TODO
                 # - Blockchain Observers/: observers.md
                 - Devnet Blockchains/: devnet_testnet.md
           - Tokens:
