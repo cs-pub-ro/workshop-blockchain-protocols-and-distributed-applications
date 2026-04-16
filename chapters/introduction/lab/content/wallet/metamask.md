@@ -29,33 +29,36 @@ MetaMask is available as a browser extension for Chrome, Firefox, Brave, and Edg
 
 After installing the extension:
 
-1. Click on the MetaMask icon in your browser toolbar
-2. Click "Get Started"
-3. Select "Create a new wallet"
-4. Create a password for your wallet (this is for accessing MetaMask on your device)
-   - Use a strong, unique password
-   - This is separate from your recovery phrase
-5. Agree to the terms of use
+1. **Open the Extension**: Click on the MetaMask icon in your browser toolbar.
+2. **Begin Setup**: You will be automatically redirected to the "Welcome" page. Select "Create new wallet".
+3. **Login**: You can choose to log in using a third-party service (like Apple or Google). If you skip this, you will need to create a password for your wallet.
+   - Use a strong, unique password.
+   - **This is separate from your recovery phrase.**
+4. **Finalize**: Agree to the terms of use.
 
 ### 3. Securing Your Recovery Phrase
 
 This is a CRITICAL step:
 
-1. MetaMask will generate a 12-word recovery phrase (seed phrase)
-2. Click "Reveal Secret Recovery Phrase" and write these words down in order
-3. Store this phrase securely offline - preferably in multiple physical locations
-4. **NEVER share this phrase with anyone or store it digitally**
-5. Complete the verification by selecting the words in the correct order
+1. **Generate the Phrase**: MetaMask will generate a unique 12-word Secret Recovery Phrase (often called a "seed phrase").
+2. **Revel and Note**: Click "Reveal Secret Recovery Phrase" and write these words down **in order**.
+3. **Store offline**: Store this phrase securely offline - preferably in multiple physical locations.
+4. **NEVER share this phrase with anyone or store it digitally.**
+5. **Verify**: Complete the verification by selecting the words in the correct order
 
-> ⚠️ **WARNING**: If you lose your recovery phrase, you will permanently lose access to your wallet and all funds. There is no "forgot password" option for blockchain wallets.
+> [!IMPORTANT]
+> The specific order of the words in your seed phrase is crucial. If you enter the words in the wrong order, you will not be able to access your funds.
+
+> [!WARNING]
+> If you lose your recovery phrase, you will permanently lose access to your wallet and all funds. There is no "forgot password" option for blockchain wallets.
 
 ### 4. Wallet Configuration
 
 Your wallet is now set up! You should see a screen with:
-- Your account address (a long string starting with 0x...)
+
+- Your account address (a long string starting with `0x...`)
 - An ETH balance (initially 0)
 - Options to buy, send, and swap cryptocurrencies
-
 
 ## Resources
 
