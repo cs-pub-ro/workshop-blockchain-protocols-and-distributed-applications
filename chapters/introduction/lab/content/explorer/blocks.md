@@ -9,14 +9,11 @@ Inspect the image below:
 
 As we can observe, **5 different blocks** have been created over the last minute, with a new block being generated approximately every 12 seconds.
 
----
-**NOTE**
-
+:::note
 We previously saw that _every 12 seconds starts new round_, but _not necessarly a new block gets notarized_.
 
 Because of this, transactions initiated within the last minute may remain in the Pending Finalization stage. They must wait to successfully pass the network's consensus mechanism before they can be officially notarized and finalized on the blockchain.
-
----
+:::
 
 ## Block details
 

@@ -8,13 +8,10 @@ Every validators/node is publicly displayed on the explorer:
 
 You can check on the explorer the nodes of every blockchain.
 
----
-**NOTE**
-
+:::note
 We call `nodes` or `validators` the computers who participate in the blockchain to execute transactions.
 The more available nodes, the more decentralized the blockchain is.
-
----
+:::
 
 Let's stick to the Ethereum. Go to the [Nodes Section](https://etherscan.io/nodetracker/nodes).
 

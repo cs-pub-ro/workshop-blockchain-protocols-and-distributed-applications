@@ -13,9 +13,6 @@ What differences can you observe?
 These blockchains offer the `Faucet` option where you can mint blockchain tokens (ETH, eGLD, etc.).
 This way the development is easier for the community.
 
----
-**NOTE**
-
+:::info
 All the tokens are "fake" tokens. They are only used to mock the real tokens on the Mainnet.
-
----
+:::

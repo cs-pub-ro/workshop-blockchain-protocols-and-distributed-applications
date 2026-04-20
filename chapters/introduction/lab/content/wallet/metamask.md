@@ -46,11 +46,13 @@ This is a CRITICAL step:
 4. **NEVER share this phrase with anyone or store it digitally.**
 5. **Verify**: Complete the verification by selecting the words in the correct order
 
-> [!IMPORTANT]
-> The specific order of the words in your seed phrase is crucial. If you enter the words in the wrong order, you will not be able to access your funds.
+:::info
+The specific order of the words in your seed phrase is crucial. If you enter the words in the wrong order, you will not be able to access your funds.
+:::
 
-> [!WARNING]
-> If you lose your recovery phrase, you will permanently lose access to your wallet and all funds. There is no "forgot password" option for blockchain wallets.
+:::warning
+If you lose your recovery phrase, you will permanently lose access to your wallet and all funds. There is no "forgot password" option for blockchain wallets.
+:::
 
 ### 4. Wallet Configuration
 
