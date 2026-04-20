@@ -16,9 +16,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 RUN npm install -g reveal-md
 
 # Install Docusaurus.
-RUN npm install create-docusaurus@2.4.3
+RUN npm install create-docusaurus@latest
 
-RUN sed -i 's/create-docusaurus@2.1.0/create-docusaurus@2.4.3/g' /usr/local/lib/python3.10/site-packages/openedu_builder/plugins/docusaurus.py
+RUN sed -i 's/create-docusaurus@latest/create-docusaurus@latest/g' /usr/local/lib/python3.10/site-packages/openedu_builder/plugins/docusaurus.py
 
 WORKDIR /content
 

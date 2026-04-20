@@ -2,7 +2,7 @@ name: OpenEduHub - PR Deployment
 
 on:
   pull_request_target:
-    types: [labeled]
+    types: [ labeled ]
 
 jobs:
   deploy:
@@ -34,7 +34,7 @@ jobs:
           file: ./repo/Dockerfile
           push: false
           load: true
-          tags: oer-template/docusaurus:v2.0.0
+          tags: oer-template/docusaurus:latest
           cache-from: type=gha
           cache-to: type=gha
 
@@ -42,7 +42,7 @@ jobs:
         run: |
           mkdir -p ${{ github.event.number }}
           docker image list
-          docker run -v $GITHUB_WORKSPACE/repo:/content -v $GITHUB_WORKSPACE/${{ github.event.number }}:/output oer-template/docusaurus:v2.0.0
+          docker run -v $GITHUB_WORKSPACE/repo:/content -v $GITHUB_WORKSPACE/${{ github.event.number }}:/output oer-template/docusaurus:latest
 
       # Popular action to deploy to GitHub Pages:
       # Docs: https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
