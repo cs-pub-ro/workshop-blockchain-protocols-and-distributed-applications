@@ -65,11 +65,13 @@ A faucet is an application that dispenses free tokens on a testnet. These tokens
 
 Many testnet environments require your wallet address to hold some real funds on the Mainnet before you can use their faucets. However, by using the [Google Cloud Web3 Faucet](https://cloud.google.com/application/web3/faucet), you can bypass this requirement and claim test tokens even with an empty wallet.
 
->[!NOTE]
-> Not all testnet networks are integreated in the *Google Cloud Web3 Faucet* service
+:::note
+Not all testnet networks are integreated in the *Google Cloud Web3 Faucet* service.
+:::
 
->[!IMPORTANT]
-> The faucet functionality is limited to one use per network, per Google account, every 24 hours. If you claim tokens and then try to use the same Google account to fund a different wallet address within that 24-hour window, it will not work.
+:::info
+The faucet functionality is limited to one use per network, per Google account, every 24 hours. If you claim tokens and then try to use the same Google account to fund a different wallet address within that 24-hour window, it will not work.
+:::
 
 For workshop exercises, you'll need test ETH for Sepolia:
 
@@ -83,7 +85,6 @@ To verify the transaction, click the Transaction Hash [link](https://sepolia.eth
 Now, Metamask will have the next output:
 
 ![img](../../media/faucet_metamask.png)
-
 
 ## Security Best Practices
 
