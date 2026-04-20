@@ -1,24 +1,21 @@
-FROM ghcr.io/open-education-hub/openedu-builder:0.6.1
+FROM ghcr.io/open-education-hub/openedu-builder:0.6.2
 
-# Install tools.
+# Install ffmpeg
 RUN apt-get update && \
-    apt-get install -yqq ffmpeg curl make
+    apt-get install -y ffmpeg curl make
 
-# Install MarkdownPP using pip.
+# Install markdown-pp
 RUN pip install MarkdownPP
 
-# Explicitly install Node 20 (Compatible with Docusaurus v2)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get update && \
-    apt-get install -yqq nodejs
+# Install node LTS (16)
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+    apt-get install -y nodejs
 
-# Install reveal-md using npm.
+# Install reveal md
 RUN npm install -g reveal-md
 
-# Install Docusaurus.
-RUN npm install create-docusaurus@latest
-
-RUN sed -i 's/create-docusaurus@latest/create-docusaurus@latest/g' /usr/local/lib/python3.10/site-packages/openedu_builder/plugins/docusaurus.py
+# Install docusaurus
+RUN npm install create-docusaurus@2.1.0
 
 WORKDIR /content
 
