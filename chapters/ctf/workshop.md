@@ -1,4 +1,4 @@
-# Attendance (Arbitrum - Ethereum SC bridge interaction) (40p)
+# Attendance (Arbitrum - Ethereum SC bridge interaction) (10p)
 
 Objective: You need to register as class attendant with your name and wallet on Ethereum Sepolia. Use your FirstName and the first initial of the LastName.
 
@@ -24,3 +24,43 @@ Objective: You need to register as class attendant with your name and wallet on 
 * ⁠⁠Arbitrum Sepolia explorer: https://sepolia.arbiscan.io/
 * ⁠⁠Onboard SC Address (Sepolia Arbitrum): 0x80a79D9AC9806bc57e11Ff83BD362d1869c766b1
 * ⁠⁠Bridge Address: https://bridge.arbitrum.io/?amount=0&destinationChain=sepolia&sourceChain=arbitrum-sepolia&tab=bridge
+
+# Bridge (Ethereum - Arbitrum SC bridge interaction) (10p)
+
+* Bridge tokens from Ethereum to Arbitrum;
+* Send them to `0x18C50b2D22dDd8e4f6B52355Ebf5918Ea5Cf47b5` to score points; The amount doesn't matter.
+
+# Swap / Exchange tokens (20p)
+
+* Swap Ethereum to USD (USDT/USDC);
+* Send them to `0x18C50b2D22dDd8e4f6B52355Ebf5918Ea5Cf47b5` to score points.
+
+# Add Liquidity (30p)
+
+* Use uniswap to add liquidity to any pool;
+* Send the LP tokens to `0x18C50b2D22dDd8e4f6B52355Ebf5918Ea5Cf47b5` to score points.
+
+# Lend / Borrow tokens (30p)
+
+* Lend tokens to Aave;
+* Send aToken (the receipt of the token you lent) to `0x18C50b2D22dDd8e4f6B52355Ebf5918Ea5Cf47b5` to score points.
+
+# Overcollateralized Loan (20p)
+
+* Supply 0.05 WETH to Aave. Note your starting collateral value and Health Factor.
+* Borrow 50% of your maximum USDC (keep Health Factor well above 1.5).
+* Swap the borrowed USDC for WETH on Uniswap. Record the WETH received.
+* Supply this new WETH to Aave again. Note your new Health Factor and total collateral.
+* CALCULATE after Loop 1: (a) Total WETH exposure, (b) Total USDC debt, (c) Effective leverage ratio = total exposure / initial capital.
+* ANALYSIS: If you ran 3 loops, estimate your leverage ratio. At what ETH price would you face liquidation? Draw the payoff diagram (sketch or describe): how does this compare to buying ETH on margin at a broker?
+
+
+# DeFiLlama
+
+1. Open DeFiLlama (defillama.com) → click 'Yields' in the left menu.
+2. Filter by stablecoin: search for USDC, DAI, USDT. Sort by APY descending.
+3. Inspect the top stablecoin yield opportunities: protocol name, chain, APY, and TVL.
+
+
+
+
