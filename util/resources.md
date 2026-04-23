@@ -2,7 +2,7 @@
 
 ## List of Resources:
 
-## Books and interesting reading materials
+### Books and interesting reading materials
 
 - [Foundations of Distributed Consensus and Blockchains](http://elaineshi.com/docs/blockchain-book.pdf) - must read book for blockchain protocol enthusiasts;
 - [Implications of Open Monetary and Information Networks](https://www.lynalden.com/open-networks/) - read to form an intuition about the need for blockchain and decentralized solutions;

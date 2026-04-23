@@ -2,7 +2,7 @@
 
 Objective: You need to register as class attendant with your name and wallet on Ethereum Sepolia. Use your FirstName and the first initial of the LastName.
 
-<!-- ![Arbitrum SC](./media/image.png) -->
+![Arbitrum SC](./media/image.png)
 
 ## Helpful info
 * You need to "Connect to Web3";
@@ -13,7 +13,7 @@ Objective: You need to register as class attendant with your name and wallet on 
 
 ## Check your attendance
 
-<!-- ![Arbitrum Query](./media/image-1.png) -->
+![Arbitrum Query](./media/image-1.png)
 
 * Go to "Read Contract" section;
 * You don't need to be connected to wallet to read information from blockchain;
