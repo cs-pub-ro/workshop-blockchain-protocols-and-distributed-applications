@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance – Live Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f9f9f8;
+      --surface:   #ffffff;
+      --border:    rgba(0,0,0,0.08);
+      --text:      #1a1a18;
+      --muted:     #6b6b67;
+      --accent:    #3266ad;
+      --accent-bg: #e6f1fb;
+      --new-bg:    #eaf3de;
+      --radius:    10px;
+      --mono:      'SFMono-Regular','Menlo','Consolas',monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:#1a1a18; --surface:#232321; --border:rgba(255,255,255,0.08);
+        --text:#f0efea; --muted:#888780; --accent:#85b7eb;
+        --accent-bg:#042c53; --new-bg:#173404;
+      }
+    }
+
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); font-size:15px; line-height:1.5; min-height:100vh; }
+
+    .shell { max-width:960px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+
+    /* ── Header ── */
+    .header { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin-bottom:2rem; flex-wrap:wrap; }
+    .header-left h1 { font-size:20px; font-weight:500; }
+    .header-left p  { font-size:13px; color:var(--muted); margin-top:2px; }
+    .badge { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500; padding:4px 10px; border-radius:20px; background:var(--accent-bg); color:var(--accent); border:0.5px solid var(--accent); }
+    .dot { width:7px; height:7px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── Metrics ── */
+    .metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:1.5rem; }
+    .card { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; }
+    .card-label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; }
+    .card-value { font-size:26px; font-weight:500; }
+    .card-sub   { font-size:12px; color:var(--muted); margin-top:2px; }
+
+    /* ── Token bar ── */
+    .token-section { margin-bottom:1rem; }
+    .token-bar {
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      background:var(--surface); border:0.5px solid var(--border);
+      border-radius:var(--radius); padding:10px 14px;
+    }
+    .token-bar-label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+    .token-pills { display:flex; gap:6px; flex-wrap:wrap; flex:1; }
+
+    .token-pill {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:12px; font-weight:500;
+      padding:4px 10px; border-radius:20px; cursor:pointer;
+      border:0.5px solid var(--border);
+      background:var(--bg); color:var(--muted);
+      transition:all 0.15s;
+    }
+    .token-pill:hover { border-color:var(--accent); color:var(--accent); }
+    .token-pill.active { background:var(--accent-bg); color:var(--accent); border-color:var(--accent); }
+    .token-pill-remove {
+      font-size:14px; line-height:1; opacity:0.5;
+      background:none; border:none; cursor:pointer; color:inherit; padding:0;
+    }
+    .token-pill-remove:hover { opacity:1; }
+
+    .add-token-btn {
+      font-size:12px; color:var(--accent);
+      background:none; border:0.5px solid var(--accent);
+      border-radius:20px; padding:4px 10px; cursor:pointer;
+      white-space:nowrap; transition:background 0.15s;
+    }
+    .add-token-btn:hover { background:var(--accent-bg); }
+
+    /* ── Add token form ── */
+    .add-token-form {
+      display:none; margin-top:8px;
+      background:var(--surface); border:0.5px solid var(--border);
+      border-radius:var(--radius); padding:12px 14px;
+    }
+    .add-token-form.visible { display:block; }
+    .add-token-form-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .add-token-form input {
+      flex:1; min-width:260px; font-size:13px;
+      background:var(--bg); color:var(--text);
+      border:0.5px solid var(--border); border-radius:6px;
+      padding:6px 10px; font-family:var(--mono);
+      outline:none;
+    }
+    .add-token-form input:focus { border-color:var(--accent); }
+    .add-token-form input::placeholder { color:var(--muted); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+    .btn-primary {
+      font-size:13px; padding:6px 14px; border-radius:6px; cursor:pointer;
+      background:var(--accent); color:#fff; border:none; white-space:nowrap;
+    }
+    .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn-ghost {
+      font-size:13px; padding:6px 10px; border-radius:6px; cursor:pointer;
+      background:none; color:var(--muted); border:none;
+    }
+    .btn-ghost:hover { color:var(--text); }
+    .form-error { font-size:12px; color:#a32d2d; margin-top:6px; display:none; }
+    @media (prefers-color-scheme:dark) { .form-error { color:#f7c1c1; } }
+
+    /* ── Status bar ── */
+    .status-bar { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-bottom:12px; flex-wrap:wrap; }
+    .refresh-btn { margin-left:auto; font-size:13px; color:var(--accent); background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:6px; }
+    .refresh-btn:hover { background:var(--accent-bg); }
+
+    /* ── Table ── */
+    .table-wrap { background:var(--surface); border:0.5px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    thead th { text-align:left; font-size:12px; font-weight:500; color:var(--muted); padding:10px 14px; border-bottom:0.5px solid var(--border); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+    tbody tr { transition:background 0.15s; }
+    tbody tr:not(:last-child) td { border-bottom:0.5px solid var(--border); }
+    tbody tr:hover td { background:var(--bg); }
+    tbody td { padding:11px 14px; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .num  { color:var(--muted); font-size:13px; }
+    .addr { font-family:var(--mono); font-size:12px; color:var(--accent); cursor:pointer; transition:opacity 0.15s; }
+    .addr:hover { opacity:0.7; }
+    .time { font-size:13px; color:var(--muted); }
+    .bal  { font-size:13px; font-family:var(--mono); }
+    .bal-loading { font-size:13px; color:var(--muted); }
+    .bal-zero { font-size:13px; color:var(--muted); }
+
+    .col-num   { width:44px; }
+    .col-name  { width:17%; }
+    .col-addr  { width:auto; }
+    .col-bal   { width:150px; }
+    .col-time  { width:130px; }
+
+    .row-new { animation:flash 2.5s ease forwards; }
+    @keyframes flash { 0%{background:var(--new-bg)} 100%{background:transparent} }
+
+    /* ── Empty / loading ── */
+    .state-box { padding:3rem; text-align:center; color:var(--muted); font-size:14px; }
+    .spinner { width:22px; height:22px; margin:0 auto 12px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* ── Error banner ── */
+    .error-banner { background:#fcebeb; color:#a32d2d; border:0.5px solid #f09595; border-radius:var(--radius); padding:12px 16px; font-size:13px; margin-bottom:1rem; display:none; }
+    @media (prefers-color-scheme:dark) { .error-banner { background:#501313; color:#f7c1c1; border-color:#a32d2d; } }
+
+    /* ── Toast ── */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--text); color:var(--bg); font-size:13px; padding:8px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .2s; }
+    .toast.show { opacity:1; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="header">
+    <div class="header-left">
+      <h1>Workshop attendance</h1>
+      <p>ASE Blockchain Workshop &nbsp;·&nbsp; Arbitrum Sepolia</p>
+    </div>
+    <span class="badge" id="liveBadge"><span class="dot"></span> connecting…</span>
+  </div>
+
+  <div id="errorBanner" class="error-banner"></div>
+
+  <div class="metrics">
+    <div class="card">
+      <div class="card-label">Registered</div>
+      <div class="card-value" id="metricTotal">—</div>
+      <div class="card-sub">students</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Last registration</div>
+      <div class="card-value" id="metricLast" style="font-size:18px;padding-top:4px;">—</div>
+      <div class="card-sub" id="metricLastTime">&nbsp;</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Attendance contract</div>
+      <div class="card-value" style="font-size:12px;font-family:var(--mono);padding-top:6px;word-break:break-all;" id="metricAddr">—</div>
+      <div class="card-sub"><a id="contractLink" href="#" target="_blank" style="color:var(--accent);text-decoration:none;">view on Arbiscan ↗</a></div>
+    </div>
+    <div class="card" id="tokenCard" style="display:none;">
+      <div class="card-label">Showing balances</div>
+      <div class="card-value" id="metricTokenSymbol" style="font-size:22px;padding-top:4px;">—</div>
+      <div class="card-sub" id="metricTokenName">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- Token management -->
+  <div class="token-section">
+    <div class="token-bar">
+      <span class="token-bar-label">Tokens</span>
+      <div class="token-pills" id="tokenPills">
+        <span style="font-size:13px;color:var(--muted);">No tokens added yet.</span>
+      </div>
+      <button class="add-token-btn" onclick="showAddTokenForm()">+ Add token</button>
+    </div>
+    <div class="add-token-form" id="addTokenForm">
+      <div class="add-token-form-row">
+        <input id="tokenInput" type="text" placeholder="ERC-20 contract address (0x…)" onkeydown="if(event.key==='Enter')addToken()" />
+        <button class="btn-primary" id="addTokenSubmit" onclick="addToken()">Add</button>
+        <button class="btn-ghost" onclick="hideAddTokenForm()">Cancel</button>
+      </div>
+      <div class="form-error" id="tokenError"></div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span id="statusText">Loading…</span>
+    <button class="refresh-btn" onclick="manualRefresh()">↻ Refresh now</button>
+  </div>
+
+  <div class="table-wrap">
+    <div id="tableState" class="state-box">
+      <div class="spinner"></div>
+      Connecting to Arbitrum Sepolia…
+    </div>
+    <table id="attendanceTable" style="display:none;">
+      <colgroup id="colgroup">
+        <col class="col-num">
+        <col class="col-name">
+        <col class="col-name">
+        <col class="col-addr">
+        <col class="col-time">
+      </colgroup>
+      <thead>
+        <tr id="tableHead">
+          <th>#</th>
+          <th>First name</th>
+          <th>Last name</th>
+          <th>Wallet address</th>
+          <th>Registered at</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Constants ─────────────────────────────────────────────────────────────────
+const CONTRACT_ADDRESS = "0x80a79D9AC9806bc57e11Ff83BD362d1869c766b1";
+const RPC_URL          = "https://sepolia-rollup.arbitrum.io/rpc";
+const ARBISCAN_BASE    = "https://sepolia.arbiscan.io";
+const POLL_MS          = 12000;
+const STORAGE_KEY      = "ase-dashboard-tokens-v1";
+
+const ATTENDANCE_ABI = [
+  "event AttendanceRegistered(address indexed student, string firstName, string lastName, uint256 timestamp)",
+  "function totalRegistrations() view returns (uint256)"
+];
+
+const ERC20_ABI = [
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+  "function balanceOf(address) view returns (uint256)"
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const students = new Map();  // lcAddr → { address, firstName, lastName, timestamp, isNew }
+const tokens   = new Map();  // lcAddr → { address, symbol, name, decimals, contract, balances: Map<lcStudentAddr, BigNumber|null> }
+let activeToken = null;      // lc token address or null
+let provider, contract, lastBlock = 0, pollTimer = null, cdTimer = null, nextPoll = 0;
+
+// ── DOM ───────────────────────────────────────────────────────────────────────
+const $body    = document.getElementById("tableBody");
+const $table   = document.getElementById("attendanceTable");
+const $head    = document.getElementById("tableHead");
+const $colgrp  = document.getElementById("colgroup");
+const $state   = document.getElementById("tableState");
+const $status  = document.getElementById("statusText");
+const $badge   = document.getElementById("liveBadge");
+const $total   = document.getElementById("metricTotal");
+const $last    = document.getElementById("metricLast");
+const $lastTm  = document.getElementById("metricLastTime");
+const $addr    = document.getElementById("metricAddr");
+const $link    = document.getElementById("contractLink");
+const $err     = document.getElementById("errorBanner");
+const $pills   = document.getElementById("tokenPills");
+const $tCard   = document.getElementById("tokenCard");
+const $tSym    = document.getElementById("metricTokenSymbol");
+const $tName   = document.getElementById("metricTokenName");
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  $addr.textContent = CONTRACT_ADDRESS.slice(0,6) + "…" + CONTRACT_ADDRESS.slice(-4);
+  $link.href = `${ARBISCAN_BASE}/address/${CONTRACT_ADDRESS}`;
+
+  try {
+    provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+    contract = new ethers.Contract(CONTRACT_ADDRESS, ATTENDANCE_ABI, provider);
+    await loadAll();
+    await restoreTokens();
+    schedulePoll();
+  } catch(e) {
+    showError("Could not connect to Arbitrum Sepolia: " + e.message);
+  }
+}
+
+// ── Load all historical attendance events ─────────────────────────────────────
+async function loadAll() {
+  setStatus("Fetching registrations…");
+  const latest = await provider.getBlockNumber();
+  const events = await contract.queryFilter("AttendanceRegistered", 0, latest);
+  for (const ev of events) {
+    const key = ev.args.student.toLowerCase();
+    students.set(key, {
+      address:   ev.args.student,
+      firstName: ev.args.firstName,
+      lastName:  ev.args.lastName,
+      timestamp: ev.args.timestamp.toNumber(),
+      isNew:     false
+    });
+  }
+  lastBlock = latest;
+  render();
+  setLive();
+}
+
+// ── Poll ──────────────────────────────────────────────────────────────────────
+async function poll() {
+  try {
+    const latest = await provider.getBlockNumber();
+    if (latest > lastBlock) {
+      const events = await contract.queryFilter("AttendanceRegistered", lastBlock + 1, latest);
+      let newStudents = [];
+      for (const ev of events) {
+        const key = ev.args.student.toLowerCase();
+        students.set(key, {
+          address:   ev.args.student,
+          firstName: ev.args.firstName,
+          lastName:  ev.args.lastName,
+          timestamp: ev.args.timestamp.toNumber(),
+          isNew:     true
+        });
+        newStudents.push(key);
+        setTimeout(() => { const s = students.get(key); if (s) s.isNew = false; }, 3000);
+      }
+      lastBlock = latest;
+      // Fetch balances for new students across all tokens
+      if (newStudents.length > 0) {
+        for (const [tAddr, tok] of tokens) {
+          await fetchBalancesFor(tok, newStudents);
+        }
+      }
+      render();
+    }
+    // Refresh balances for active token
+    if (activeToken && tokens.has(activeToken)) {
+      await fetchBalancesFor(tokens.get(activeToken), [...students.keys()]);
+      render();
+    }
+    setLive();
+  } catch(e) {
+    setStatus("⚠ Poll error – retrying…");
+  }
+  schedulePoll();
+}
+
+function schedulePoll() {
+  clearTimeout(pollTimer); clearInterval(cdTimer);
+  nextPoll = Date.now() + POLL_MS;
+  pollTimer = setTimeout(poll, POLL_MS);
+  cdTimer = setInterval(() => {
+    const s = Math.max(0, Math.round((nextPoll - Date.now()) / 1000));
+    setStatus(`Live · refreshing in ${s}s`);
+  }, 1000);
+}
+
+async function manualRefresh() {
+  clearTimeout(pollTimer); clearInterval(cdTimer);
+  setStatus("Refreshing…");
+  await poll();
+}
+
+// ── Token management ──────────────────────────────────────────────────────────
+async function addToken() {
+  const raw = document.getElementById("tokenInput").value.trim();
+  const $btn = document.getElementById("addTokenSubmit");
+  const $ferr = document.getElementById("tokenError");
+  $ferr.style.display = "none";
+
+  if (!ethers.utils.isAddress(raw)) {
+    showFormError("Not a valid Ethereum address."); return;
+  }
+  const key = raw.toLowerCase();
+  if (tokens.has(key)) {
+    showFormError("Token already added."); return;
+  }
+
+  $btn.disabled = true;
+  $btn.textContent = "Loading…";
+  try {
+    const tok = await resolveToken(raw);
+    tokens.set(key, tok);
+    saveTokens();
+    await fetchBalancesFor(tok, [...students.keys()]);
+    setActiveToken(key);
+    hideAddTokenForm();
+    renderPills();
+    render();
+  } catch(e) {
+    showFormError("Could not load token: " + (e.reason || e.message));
+  } finally {
+    $btn.disabled = false;
+    $btn.textContent = "Add";
+  }
+}
+
+async function resolveToken(address) {
+  const erc20 = new ethers.Contract(address, ERC20_ABI, provider);
+  const [name, symbol, decimals] = await Promise.all([
+    erc20.name(), erc20.symbol(), erc20.decimals()
+  ]);
+  return { address, symbol, name, decimals, contract: erc20, balances: new Map() };
+}
+
+async function fetchBalancesFor(tok, studentKeys) {
+  const calls = studentKeys.map(k =>
+    tok.contract.balanceOf(students.get(k)?.address || k)
+      .then(b => [k, b])
+      .catch(() => [k, null])
+  );
+  const results = await Promise.all(calls);
+  for (const [k, bal] of results) tok.balances.set(k, bal);
+}
+
+function removeToken(key) {
+  tokens.delete(key);
+  if (activeToken === key) {
+    activeToken = tokens.size > 0 ? tokens.keys().next().value : null;
+  }
+  saveTokens();
+  renderPills();
+  render();
+}
+
+function setActiveToken(key) {
+  activeToken = key;
+  renderPills();
+  render();
+}
+
+// ── Persist tokens ────────────────────────────────────────────────────────────
+function saveTokens() {
+  const data = [...tokens.values()].map(t => t.address);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+async function restoreTokens() {
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch {}
+  for (const addr of saved) {
+    const key = addr.toLowerCase();
+    if (tokens.has(key)) continue;
+    try {
+      const tok = await resolveToken(addr);
+      tokens.set(key, tok);
+      await fetchBalancesFor(tok, [...students.keys()]);
+    } catch {}
+  }
+  if (tokens.size > 0 && !activeToken) activeToken = tokens.keys().next().value;
+  renderPills();
+  render();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderPills() {
+  if (tokens.size === 0) {
+    $pills.innerHTML = `<span style="font-size:13px;color:var(--muted);">No tokens added yet.</span>`;
+    $tCard.style.display = "none";
+    return;
+  }
+  $pills.innerHTML = [...tokens.entries()].map(([key, t]) => `
+    <button class="token-pill ${key === activeToken ? 'active' : ''}" onclick="setActiveToken('${key}')">
+      ${esc(t.symbol)}
+      <button class="token-pill-remove" onclick="event.stopPropagation();removeToken('${key}')" title="Remove">×</button>
+    </button>
+  `).join("");
+
+  if (activeToken && tokens.has(activeToken)) {
+    const t = tokens.get(activeToken);
+    $tCard.style.display = "block";
+    $tSym.textContent  = t.symbol;
+    $tName.textContent = t.name;
+  } else {
+    $tCard.style.display = "none";
+  }
+}
+
+function render() {
+  const tok     = activeToken ? tokens.get(activeToken) : null;
+  const hasTok  = !!tok;
+  const sorted  = [...students.values()].sort((a, b) => a.timestamp - b.timestamp);
+
+  // Update table header columns
+  if (hasTok) {
+    $head.innerHTML = `<th>#</th><th>First name</th><th>Last name</th><th>Wallet address</th><th class="col-bal">${esc(tok.symbol)} balance</th><th>Registered at</th>`;
+    $colgrp.innerHTML = `<col class="col-num"><col class="col-name"><col class="col-name"><col class="col-addr"><col class="col-bal"><col class="col-time">`;
+  } else {
+    $head.innerHTML = `<th>#</th><th>First name</th><th>Last name</th><th>Wallet address</th><th>Registered at</th>`;
+    $colgrp.innerHTML = `<col class="col-num"><col class="col-name"><col class="col-name"><col class="col-addr"><col class="col-time">`;
+  }
+
+  if (sorted.length === 0) {
+    $state.innerHTML = `<p style="color:var(--muted);font-size:14px;">No registrations yet.</p>`;
+    $state.style.display = "block";
+    $table.style.display = "none";
+  } else {
+    $state.style.display = "none";
+    $table.style.display = "table";
+  }
+
+  $body.innerHTML = sorted.map((s, i) => {
+    const balCell = hasTok ? `<td class="${balClass(tok, s)}">${fmtBal(tok, s)}</td>` : "";
+    return `
+      <tr class="${s.isNew ? 'row-new' : ''}">
+        <td class="num">${i + 1}</td>
+        <td>${esc(s.firstName)}</td>
+        <td>${esc(s.lastName)}</td>
+        <td><span class="addr" title="${s.address}" onclick="copyAddr('${s.address}')">${s.address.slice(0,6)}…${s.address.slice(-4)}</span></td>
+        ${balCell}
+        <td class="time">${fmtTime(s.timestamp)}</td>
+      </tr>`;
+  }).join("");
+
+  $total.textContent = sorted.length;
+  if (sorted.length > 0) {
+    const last = sorted[sorted.length - 1];
+    $last.textContent = esc(last.firstName) + " " + esc(last.lastName);
+    $lastTm.textContent = fmtTime(last.timestamp);
+  }
+}
+
+function fmtBal(tok, student) {
+  const key = student.address.toLowerCase();
+  const raw = tok.balances.get(key);
+  if (raw === undefined) return `<span class="bal-loading">…</span>`;
+  if (raw === null)      return `<span class="bal-loading">—</span>`;
+  const formatted = parseFloat(ethers.utils.formatUnits(raw, tok.decimals));
+  if (formatted === 0)   return `<span class="bal-zero">0 ${esc(tok.symbol)}</span>`;
+  const display = formatted >= 1000
+    ? formatted.toLocaleString(undefined, { maximumFractionDigits: 2 })
+    : formatted.toLocaleString(undefined, { maximumFractionDigits: 4 });
+  return `<span class="bal">${display} <span style="color:var(--muted);font-size:11px;">${esc(tok.symbol)}</span></span>`;
+}
+
+function balClass(tok, student) {
+  const raw = tok.balances.get(student.address.toLowerCase());
+  if (!raw) return "";
+  return raw.isZero() ? "bal-zero" : "bal";
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function showAddTokenForm() {
+  document.getElementById("addTokenForm").classList.add("visible");
+  document.getElementById("tokenInput").focus();
+}
+function hideAddTokenForm() {
+  document.getElementById("addTokenForm").classList.remove("visible");
+  document.getElementById("tokenInput").value = "";
+  document.getElementById("tokenError").style.display = "none";
+}
+function showFormError(msg) {
+  const $e = document.getElementById("tokenError");
+  $e.textContent = msg; $e.style.display = "block";
+}
+
+function fmtTime(u) {
+  const d = new Date(u * 1000);
+  return d.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit", second:"2-digit" })
+       + " · " + d.toLocaleDateString([], { day:"2-digit", month:"short" });
+}
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function setStatus(m) { $status.textContent = m; }
+function setLive() {
+  $badge.innerHTML = '<span class="dot"></span> live';
+  $err.style.display = "none";
+}
+function showError(msg) {
+  $badge.innerHTML = '⚠ error';
+  $err.style.display = "block"; $err.textContent = msg;
+  $state.innerHTML = `<p style="color:var(--muted);font-size:14px;">Could not load data.</p>`;
+}
+function copyAddr(addr) {
+  navigator.clipboard.writeText(addr).then(() => showToast("Address copied"));
+}
+function showToast(msg) {
+  const $t = document.getElementById("toast");
+  $t.textContent = msg; $t.classList.add("show");
+  setTimeout(() => $t.classList.remove("show"), 1800);
+}
+
+init();
+</script>
+</body>
+</html>
