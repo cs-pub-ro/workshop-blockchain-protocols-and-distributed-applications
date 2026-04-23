@@ -2,18 +2,19 @@
 
 Objective: You need to register as class attendant with your name and wallet on Ethereum Sepolia. Use your FirstName and the first initial of the LastName.
 
-![Arbitrum SC](./media/image.png)
+<!-- ![Arbitrum SC](./media/image.png) -->
 
 ## Helpful info
 * You need to "Connect to Web3";
 * Fill the fields;
 * Click on "Write" to submit the transaction;
 * Your Metamask extension will pop up to confirm the transaction;
+* USDT Token Address: `0x7169D38820dfd117C3FA1f22a697dBA58d90BA06`
 
 
 ## Check your attendance
 
-![Arbitrum Query](./media/image-1.png)
+<!-- ![Arbitrum Query](./media/image-1.png) -->
 
 * Go to "Read Contract" section;
 * You don't need to be connected to wallet to read information from blockchain;

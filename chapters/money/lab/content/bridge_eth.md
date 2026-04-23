@@ -4,7 +4,7 @@
 ## Arbitrum Bridge
 
 Here is the [Arbitrum Bridge](https://portal.arbitrum.io/bridge).
-![alt text](../media/arbitrum_bridge.png)
+<!-- ![Arbitrum Bridge](../media/arbitrum_bridge.png) -->
 
 ## Superbridge
 

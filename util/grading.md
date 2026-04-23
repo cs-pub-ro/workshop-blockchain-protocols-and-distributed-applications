@@ -16,8 +16,6 @@ Please check the [Challenges section](https://cs-pub-ro.github.io/workshop-block
 
 <sup>1</sup> perform the [token creation on Arbitrum Sepolia](../chapters/tokens/lab/content/mint_tokens_eth.md)
 
-
-
 <sup>2</sup> perform the wallet creation, token creation, liquidity pool, swaps on MultiversX Mainnet:
 
 * https://wallet.multiversx.com/
