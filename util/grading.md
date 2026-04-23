@@ -5,11 +5,15 @@ Please check the [Challenges section](https://cs-pub-ro.github.io/workshop-block
 | Section    | Percent of total grade |
 | -------- | ------- |
 | Attendance (Arbitrum - Ethereum SC bridge interaction) | 40p |
-| Arbitrum Token Creations| 10p |
-| MultiversX Tasks | 50p |
+| Arbitrum Token Creations| 20p |
+| Token Swap| 20p |
+| Add Liquidity| 30p |
+| Lend / Borrow tokens| 30p |
+| Overcollateralized Loan| 40p |
+| MultiversX Tasks | 20p |
 | Bonus | 30p<sup>1</sup><sup>2</sup><sup>3</sup>|
-| **Total** | **100p** |
-| **Total with Bonus** | **130p** |
+| **Total** | **200p** |
+| **Total with Bonus** | **230p** |
 
 <sup>1</sup> perform the wallet creation, token creation, liquidity pool, swaps on MultiversX Mainnet:
 
