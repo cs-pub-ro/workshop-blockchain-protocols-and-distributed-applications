@@ -3,7 +3,7 @@
 We will use [this](https://tools.smithii.io/) decentralized applications (dApp).
 In this section you will learn how to mint tokens on EVM based blockchains.
 
-## Mint ESDT
+## Mint ERC-20
 
 Click on the **Create Token** button and then fill the necessary fields.
 
@@ -36,6 +36,6 @@ You should see the tokens in your wallet.
 
 ## Practice
 
-* Create your own ESDT token;
+* Create your own ERC-20 token;
 * Inspect the transaction;
 * You can also use [this link](https://tokentool.bitbond.com/create-token/erc20-token/arbitrum-sepolia).
