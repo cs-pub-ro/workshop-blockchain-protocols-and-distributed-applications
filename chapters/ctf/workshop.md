@@ -30,6 +30,11 @@ Objective: You need to register as class attendant with your name and wallet on 
 * Bridge tokens from Ethereum to Arbitrum;
 * Send them to `0x18C50b2D22dDd8e4f6B52355Ebf5918Ea5Cf47b5` to score points; The amount doesn't matter.
 
+# Create a Token on Arbitrum (10p)
+
+* Create a token on Arbitrum;
+* Send them to `0x18C50b2D22dDd8e4f6B52355Ebf5918Ea5Cf47b5` to score points.
+
 # Swap / Exchange tokens (20p)
 
 * Swap Ethereum to USD (USDT/USDC);
@@ -45,7 +50,7 @@ Objective: You need to register as class attendant with your name and wallet on 
 * Lend tokens to Aave;
 * Send aToken (the receipt of the token you lent) to `0x18C50b2D22dDd8e4f6B52355Ebf5918Ea5Cf47b5` to score points.
 
-# Overcollateralized Loan (20p)
+# Overcollateralized Loan (40p)
 
 * Supply 0.05 WETH to Aave. Note your starting collateral value and Health Factor.
 * Borrow 50% of your maximum USDC (keep Health Factor well above 1.5).
