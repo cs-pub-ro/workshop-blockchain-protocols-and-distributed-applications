@@ -1,0 +1,475 @@
+
+<h2 class="sr-only">Interactive AMM liquidity pool demo showing how token swaps work, how liquidity providers earn fees, and the constant product formula x*y=k</h2>
+
+<style>
+.tab-btn { background: transparent; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 6px 14px; font-size: 13px; cursor: pointer; color: var(--color-text-secondary); transition: all .15s; }
+.tab-btn.active { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); font-weight: 500; }
+.tab-btn:hover:not(.active) { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.panel { display: none; } .panel.active { display: block; }
+.token-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 16px; text-align: center; }
+.token-amount { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.token-label { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+.formula-box { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 16px; font-size: 13px; color: var(--color-text-secondary); text-align: center; }
+.k-val { font-weight: 500; color: var(--color-text-primary); font-size: 15px; }
+.fee-badge { display: inline-block; background: var(--color-background-success); color: var(--color-text-success); border-radius: var(--border-radius-md); font-size: 12px; padding: 2px 8px; font-weight: 500; }
+.msg { font-size: 13px; padding: 8px 12px; border-radius: var(--border-radius-md); margin-top: 12px; }
+.msg-info { background: var(--color-background-info); color: var(--color-text-info); }
+.msg-success { background: var(--color-background-success); color: var(--color-text-success); }
+.msg-warn { background: var(--color-background-warning); color: var(--color-text-warning); }
+.lp-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 12px 16px; }
+.divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 16px 0; }
+.price-arrow { font-size: 20px; color: var(--color-text-secondary); }
+.impact-bar-bg { background: var(--color-background-secondary); border-radius: 4px; height: 8px; width: 100%; overflow: hidden; }
+.impact-bar { height: 8px; border-radius: 4px; background: #E24B4A; transition: width .3s; }
+.stat-label { font-size: 12px; color: var(--color-text-secondary); }
+.stat-value { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+</style>
+
+<div style="padding: 1rem 0">
+
+<div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem; flex-wrap:wrap;">
+  <button class="tab-btn active" onclick="switchTab('pool')">Pool overview</button>
+  <button class="tab-btn" onclick="switchTab('swap')">Swap tokens</button>
+  <button class="tab-btn" onclick="switchTab('provide')">Add / remove liquidity</button>
+  <button class="tab-btn" onclick="switchTab('earn')">Fees &amp; yield</button>
+</div>
+
+<div id="panel-pool" class="panel active">
+  <p style="font-size:14px; color:var(--color-text-secondary); margin:0 0 1rem;">An AMM pool holds two tokens. Their ratio determines the price. The rule: <strong>x × y = k</strong> — the product never changes.</p>
+
+  <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; margin-bottom:1rem;">
+    <div class="token-box">
+      <div style="font-size:24px;">E</div>
+      <div class="token-amount" id="pool-eth">1,000</div>
+      <div class="token-label">ETH in pool</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:22px; color:var(--color-text-secondary);">×</div>
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-top:4px;">constant product</div>
+    </div>
+    <div class="token-box">
+      <div style="font-size:24px;">$</div>
+      <div class="token-amount" id="pool-usdc">2,000,000</div>
+      <div class="token-label">USDC in pool</div>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    k = ETH × USDC = <span class="k-val" id="k-display">2,000,000,000</span> &nbsp;(constant forever)
+  </div>
+
+  <hr class="divider">
+
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+    <div style="text-align:center;">
+      <div class="stat-label">Current ETH price</div>
+      <div class="stat-value" id="eth-price">$2,000</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="stat-label">Total value locked</div>
+      <div class="stat-value" id="tvl">$4,000,000</div>
+    </div>
+    <div style="text-align:center;">
+      <div class="stat-label">LP tokens issued</div>
+      <div class="stat-value" id="lp-supply-display">1,000</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div style="position:relative; width:100%; height:220px;">
+    <canvas id="curveChart" role="img" aria-label="Constant product curve showing ETH and USDC balances, with current pool position marked">Constant product curve: as ETH decreases, USDC increases proportionally to keep x*y=k constant.</canvas>
+  </div>
+  <div style="font-size:11px; color:var(--color-text-secondary); text-align:center; margin-top:4px;">The curve x × y = k — every trade moves along this line</div>
+</div>
+
+<div id="panel-swap" class="panel">
+  <p style="font-size:14px; color:var(--color-text-secondary); margin:0 0 1rem;">When you swap tokens, the pool rebalances along the curve. The more you swap, the higher the price impact (slippage).</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:1rem;">
+    <div>
+      <label style="font-size:13px; color:var(--color-text-secondary); display:block; margin-bottom:6px;">I want to swap</label>
+      <select id="swap-dir" onchange="updateSwapCalc()" style="width:100%; margin-bottom:8px; font-size:13px; padding:6px 10px; border:0.5px solid var(--color-border-tertiary); border-radius:var(--border-radius-md); background:var(--color-background-primary); color:var(--color-text-primary);">
+        <option value="eth-to-usdc">ETH → USDC</option>
+        <option value="usdc-to-eth">USDC → ETH</option>
+      </select>
+      <label style="font-size:13px; color:var(--color-text-secondary); display:block; margin-bottom:4px;">Amount: <span id="swap-amount-label">50 ETH</span></label>
+      <input type="range" id="swap-amount" min="1" max="300" step="1" value="50" oninput="updateSwapCalc()" style="width:100%;">
+    </div>
+    <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:14px;">
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:8px;">Swap preview</div>
+      <div style="font-size:13px; margin-bottom:6px;">You send: <strong id="swap-in-amount">50 ETH</strong></div>
+      <div style="font-size:13px; margin-bottom:6px;">You receive: <strong id="swap-out-amount">—</strong></div>
+      <div style="font-size:13px; margin-bottom:6px;">Effective price: <strong id="swap-eff-price">—</strong></div>
+      <div style="font-size:13px; margin-bottom:6px;">Price impact: <strong id="swap-impact" style="color:#E24B4A;">—</strong></div>
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:4px;">Fee paid to LPs (0.3%): <strong id="swap-fee">—</strong></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:8px;">
+    <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--color-text-secondary); margin-bottom:4px;">
+      <span>Price impact</span>
+      <span id="impact-pct-label">0%</span>
+    </div>
+    <div class="impact-bar-bg"><div class="impact-bar" id="impact-bar" style="width:0%;"></div></div>
+  </div>
+
+  <button onclick="executeSwap()" style="width:100%; padding:10px; font-size:14px; font-weight:500; background:var(--color-background-info); color:var(--color-text-info); border:0.5px solid var(--color-border-info); border-radius:var(--border-radius-md); cursor:pointer; margin-top:8px;">Execute swap</button>
+
+  <div id="swap-msg" style="display:none;" class="msg msg-success"></div>
+
+  <hr class="divider">
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div style="text-align:center;"><div class="stat-label">Pool ETH</div><div class="stat-value" id="s-eth">1,000</div></div>
+    <div style="text-align:center;"><div class="stat-label">Pool USDC</div><div class="stat-value" id="s-usdc">2,000,000</div></div>
+  </div>
+</div>
+
+<div id="panel-provide" class="panel">
+  <p style="font-size:14px; color:var(--color-text-secondary); margin:0 0 1rem;">Liquidity providers (LPs) deposit <em>both</em> tokens at the current ratio. They receive LP tokens representing their share of the pool.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:1rem;">
+    <div class="lp-card">
+      <div style="font-size:13px; font-weight:500; margin-bottom:10px; color:var(--color-text-primary);">Add liquidity</div>
+      <label style="font-size:12px; color:var(--color-text-secondary);">ETH to deposit: <span id="add-eth-label">100</span></label>
+      <input type="range" id="add-eth" min="10" max="500" step="10" value="100" oninput="updateAddCalc()" style="width:100%; margin:4px 0 10px;">
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:4px;">You also need: <strong id="add-usdc-needed">200,000 USDC</strong></div>
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:4px;">You receive: <strong id="add-lp-tokens">~100 LP tokens</strong></div>
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:12px;">Your pool share: <strong id="add-share">~9.1%</strong></div>
+      <button onclick="addLiquidity()" style="width:100%; padding:8px; font-size:13px; background:var(--color-background-success); color:var(--color-text-success); border:0.5px solid var(--color-border-success); border-radius:var(--border-radius-md); cursor:pointer; font-weight:500;">Add liquidity</button>
+    </div>
+
+    <div class="lp-card">
+      <div style="font-size:13px; font-weight:500; margin-bottom:10px; color:var(--color-text-primary);">Remove liquidity</div>
+      <label style="font-size:12px; color:var(--color-text-secondary);">LP tokens to burn: <span id="remove-lp-label">50</span></label>
+      <input type="range" id="remove-lp" min="1" max="200" step="1" value="50" oninput="updateRemoveCalc()" style="width:100%; margin:4px 0 10px;">
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:4px;">You get back: <strong id="remove-eth">~50 ETH</strong></div>
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:4px;">+ <strong id="remove-usdc">~100,000 USDC</strong></div>
+      <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:12px;">Plus your share of all fees earned!</div>
+      <button onclick="removeLiquidity()" style="width:100%; padding:8px; font-size:13px; background:var(--color-background-danger); color:var(--color-text-danger); border:0.5px solid var(--color-border-danger); border-radius:var(--border-radius-md); cursor:pointer; font-weight:500;">Remove liquidity</button>
+    </div>
+  </div>
+
+  <div id="provide-msg" style="display:none;" class="msg"></div>
+
+  <hr class="divider">
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+    <div style="text-align:center;"><div class="stat-label">Pool ETH</div><div class="stat-value" id="p-eth">1,000</div></div>
+    <div style="text-align:center;"><div class="stat-label">Pool USDC</div><div class="stat-value" id="p-usdc">2,000,000</div></div>
+    <div style="text-align:center;"><div class="stat-label">Total LP tokens</div><div class="stat-value" id="p-lp">1,000</div></div>
+  </div>
+</div>
+
+<div id="panel-earn" class="panel">
+  <p style="font-size:14px; color:var(--color-text-secondary); margin:0 0 1rem;">Every swap charges a 0.3% fee. This fee stays in the pool, growing the value of each LP token over time.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:1rem;">
+    <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:14px;">
+      <div class="stat-label">Total fees collected</div>
+      <div style="font-size:22px; font-weight:500; color:var(--color-text-success); margin:4px 0;" id="total-fees">$0</div>
+      <div class="stat-label">across <span id="total-swaps">0</span> swaps</div>
+    </div>
+    <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:14px;">
+      <div class="stat-label">Value per LP token</div>
+      <div style="font-size:22px; font-weight:500; color:var(--color-text-primary); margin:4px 0;" id="lp-token-value">$4,000</div>
+      <div class="stat-label" id="lp-growth">No growth yet</div>
+    </div>
+  </div>
+
+  <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:14px; margin-bottom:1rem;">
+    <div style="font-size:13px; font-weight:500; margin-bottom:10px;">Simulate trading volume</div>
+    <label style="font-size:12px; color:var(--color-text-secondary);">Daily trades: <span id="sim-trades-label">20</span> swaps/day</label>
+    <input type="range" id="sim-trades" min="1" max="100" step="1" value="20" oninput="document.getElementById('sim-trades-label').textContent=this.value" style="width:100%; margin:4px 0 10px;">
+    <label style="font-size:12px; color:var(--color-text-secondary);">Avg trade size: <span id="sim-size-label">$10,000</span></label>
+    <input type="range" id="sim-size" min="1000" max="100000" step="1000" value="10000" oninput="document.getElementById('sim-size-label').textContent='$'+Number(this.value).toLocaleString()" style="width:100%; margin:4px 0 10px;">
+    <button onclick="runSimulation()" style="padding:8px 16px; font-size:13px; font-weight:500; background:var(--color-background-info); color:var(--color-text-info); border:0.5px solid var(--color-border-info); border-radius:var(--border-radius-md); cursor:pointer;">Simulate 30 days</button>
+  </div>
+
+  <div style="position:relative; width:100%; height:180px;">
+    <canvas id="feesChart" role="img" aria-label="Bar chart showing daily fee accumulation over 30 days">Daily fee accumulation simulation over 30 days.</canvas>
+  </div>
+
+  <div id="sim-summary" style="display:none;" class="msg msg-info" style="margin-top:12px;"></div>
+
+  <hr class="divider">
+  <div style="font-size:13px; color:var(--color-text-secondary); background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px; line-height:1.6;">
+    <strong style="color:var(--color-text-primary);">Impermanent loss warning:</strong> If the price of ETH changes a lot, LPs may end up with less value than if they had just held the tokens — this is called impermanent loss. The fee income should compensate for this risk.
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var state = {
+  ethReserve: 1000,
+  usdcReserve: 2000000,
+  lpSupply: 1000,
+  feesCollected: 0,
+  swapCount: 0,
+  initialLpValue: 4000
+};
+
+function k() { return state.ethReserve * state.usdcReserve; }
+function ethPrice() { return state.usdcReserve / state.ethReserve; }
+function tvl() { return state.ethReserve * ethPrice() + state.usdcReserve; }
+function lpTokenValue() { return tvl() / state.lpSupply; }
+
+function fmt(n, decimals) {
+  if (decimals === undefined) decimals = 0;
+  return Number(n).toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + t).classList.add('active');
+  if (t === 'pool') drawCurve();
+  if (t === 'earn') drawFeesChart();
+}
+
+function updateAllStats() {
+  var ep = ethPrice();
+  var tv = tvl();
+  var lv = lpTokenValue();
+  document.getElementById('pool-eth').textContent = fmt(state.ethReserve);
+  document.getElementById('pool-usdc').textContent = fmt(state.usdcReserve);
+  document.getElementById('k-display').textContent = fmt(k());
+  document.getElementById('eth-price').textContent = '$' + fmt(ep);
+  document.getElementById('tvl').textContent = '$' + fmt(tv);
+  document.getElementById('lp-supply-display').textContent = fmt(state.lpSupply);
+  document.getElementById('s-eth').textContent = fmt(state.ethReserve);
+  document.getElementById('s-usdc').textContent = fmt(state.usdcReserve);
+  document.getElementById('p-eth').textContent = fmt(state.ethReserve);
+  document.getElementById('p-usdc').textContent = fmt(state.usdcReserve);
+  document.getElementById('p-lp').textContent = fmt(state.lpSupply);
+  document.getElementById('total-fees').textContent = '$' + fmt(state.feesCollected);
+  document.getElementById('total-swaps').textContent = state.swapCount;
+  document.getElementById('lp-token-value').textContent = '$' + fmt(lv);
+  var growth = ((lv - state.initialLpValue) / state.initialLpValue * 100);
+  document.getElementById('lp-growth').textContent = growth >= 0 ? '+' + growth.toFixed(2) + '% vs initial' : growth.toFixed(2) + '% vs initial';
+  updateSwapCalc();
+  updateAddCalc();
+  updateRemoveCalc();
+}
+
+function updateSwapCalc() {
+  var dir = document.getElementById('swap-dir').value;
+  var maxAmt = dir === 'eth-to-usdc' ? 300 : 600000;
+  var slider = document.getElementById('swap-amount');
+  slider.max = dir === 'eth-to-usdc' ? 300 : 600000;
+  slider.step = dir === 'eth-to-usdc' ? 1 : 1000;
+  var amt = parseFloat(slider.value);
+  var label, inLabel, outAmt, effPrice, impact, fee;
+
+  if (dir === 'eth-to-usdc') {
+    label = fmt(amt) + ' ETH';
+    inLabel = fmt(amt) + ' ETH';
+    var feeAmt = amt * 0.003;
+    var amtAfterFee = amt - feeAmt;
+    var newEth = state.ethReserve + amtAfterFee;
+    var newUsdc = k() / newEth;
+    outAmt = state.usdcReserve - newUsdc;
+    effPrice = outAmt / amt;
+    impact = Math.abs((effPrice - ethPrice()) / ethPrice() * 100);
+    fee = feeAmt * ethPrice();
+    document.getElementById('swap-out-amount').textContent = fmt(outAmt) + ' USDC';
+    document.getElementById('swap-eff-price').textContent = '$' + fmt(effPrice) + ' / ETH';
+    document.getElementById('swap-fee').textContent = fmt(feeAmt, 3) + ' ETH ≈ $' + fmt(fee);
+  } else {
+    if (amt > 600000) amt = 600000;
+    label = '$' + fmt(amt) + ' USDC';
+    inLabel = '$' + fmt(amt) + ' USDC';
+    var feeAmt = amt * 0.003;
+    var amtAfterFee = amt - feeAmt;
+    var newUsdc = state.usdcReserve + amtAfterFee;
+    var newEth = k() / newUsdc;
+    outAmt = state.ethReserve - newEth;
+    effPrice = amt / outAmt;
+    impact = Math.abs((effPrice - ethPrice()) / ethPrice() * 100);
+    fee = feeAmt;
+    document.getElementById('swap-out-amount').textContent = fmt(outAmt, 2) + ' ETH';
+    document.getElementById('swap-eff-price').textContent = '$' + fmt(effPrice) + ' / ETH';
+    document.getElementById('swap-fee').textContent = '$' + fmt(feeAmt);
+  }
+
+  document.getElementById('swap-amount-label').textContent = label;
+  document.getElementById('swap-in-amount').textContent = inLabel;
+  impact = Math.min(impact, 100);
+  document.getElementById('swap-impact').textContent = impact.toFixed(2) + '%';
+  document.getElementById('impact-pct-label').textContent = impact.toFixed(2) + '%';
+  document.getElementById('impact-bar').style.width = Math.min(impact * 5, 100) + '%';
+}
+
+function executeSwap() {
+  var dir = document.getElementById('swap-dir').value;
+  var amt = parseFloat(document.getElementById('swap-amount').value);
+  var msg = document.getElementById('swap-msg');
+
+  if (dir === 'eth-to-usdc') {
+    var feeAmt = amt * 0.003;
+    var amtAfterFee = amt - feeAmt;
+    var newEth = state.ethReserve + amtAfterFee;
+    var newUsdc = k() / newEth;
+    var received = state.usdcReserve - newUsdc;
+    var feeValue = feeAmt * ethPrice();
+    state.ethReserve = newEth;
+    state.usdcReserve = newUsdc;
+    state.feesCollected += feeValue;
+    state.swapCount++;
+    msg.textContent = 'Swapped ' + fmt(amt) + ' ETH for ' + fmt(received) + ' USDC. Fee: $' + fmt(feeValue) + ' added to pool.';
+  } else {
+    var feeAmt = amt * 0.003;
+    var amtAfterFee = amt - feeAmt;
+    var newUsdc = state.usdcReserve + amtAfterFee;
+    var newEth = k() / newUsdc;
+    var received = state.ethReserve - newEth;
+    state.usdcReserve = newUsdc;
+    state.ethReserve = newEth;
+    state.feesCollected += feeAmt;
+    state.swapCount++;
+    msg.textContent = 'Swapped $' + fmt(amt) + ' USDC for ' + fmt(received, 3) + ' ETH. Fee: $' + fmt(feeAmt) + ' added to pool.';
+  }
+
+  msg.style.display = 'block';
+  msg.className = 'msg msg-success';
+  updateAllStats();
+  setTimeout(() => { msg.style.display = 'none'; }, 4000);
+}
+
+function updateAddCalc() {
+  var eth = parseFloat(document.getElementById('add-eth').value);
+  var usdc = eth * ethPrice();
+  var lpToGet = (eth / state.ethReserve) * state.lpSupply;
+  var share = (lpToGet / (state.lpSupply + lpToGet)) * 100;
+  document.getElementById('add-eth-label').textContent = fmt(eth);
+  document.getElementById('add-usdc-needed').textContent = fmt(usdc) + ' USDC';
+  document.getElementById('add-lp-tokens').textContent = '~' + fmt(lpToGet, 1) + ' LP tokens';
+  document.getElementById('add-share').textContent = '~' + share.toFixed(1) + '%';
+}
+
+function addLiquidity() {
+  var eth = parseFloat(document.getElementById('add-eth').value);
+  var usdc = eth * ethPrice();
+  var lpToGet = (eth / state.ethReserve) * state.lpSupply;
+  state.ethReserve += eth;
+  state.usdcReserve += usdc;
+  state.lpSupply += lpToGet;
+  var msg = document.getElementById('provide-msg');
+  msg.textContent = 'Added ' + fmt(eth) + ' ETH + ' + fmt(usdc) + ' USDC. Received ' + fmt(lpToGet, 1) + ' LP tokens. Your share: ' + ((lpToGet / state.lpSupply) * 100).toFixed(1) + '%';
+  msg.style.display = 'block';
+  msg.className = 'msg msg-success';
+  updateAllStats();
+  setTimeout(() => { msg.style.display = 'none'; }, 5000);
+}
+
+function updateRemoveCalc() {
+  var lp = parseFloat(document.getElementById('remove-lp').value);
+  var share = lp / state.lpSupply;
+  var ethBack = share * state.ethReserve;
+  var usdcBack = share * state.usdcReserve;
+  document.getElementById('remove-lp-label').textContent = fmt(lp);
+  document.getElementById('remove-eth').textContent = '~' + fmt(ethBack, 2) + ' ETH';
+  document.getElementById('remove-usdc').textContent = fmt(usdcBack) + ' USDC';
+}
+
+function removeLiquidity() {
+  var lp = parseFloat(document.getElementById('remove-lp').value);
+  var msg = document.getElementById('provide-msg');
+  if (lp >= state.lpSupply) {
+    msg.textContent = 'Cannot remove all liquidity.';
+    msg.style.display = 'block';
+    msg.className = 'msg msg-warn';
+    return;
+  }
+  var share = lp / state.lpSupply;
+  var ethBack = share * state.ethReserve;
+  var usdcBack = share * state.usdcReserve;
+  state.ethReserve -= ethBack;
+  state.usdcReserve -= usdcBack;
+  state.lpSupply -= lp;
+  msg.textContent = 'Burned ' + fmt(lp) + ' LP tokens. Received ' + fmt(ethBack, 2) + ' ETH + ' + fmt(usdcBack) + ' USDC (including earned fees).';
+  msg.style.display = 'block';
+  msg.className = 'msg msg-success';
+  updateAllStats();
+  setTimeout(() => { msg.style.display = 'none'; }, 5000);
+}
+
+var curveChartInstance = null;
+function drawCurve() {
+  var ctx = document.getElementById('curveChart');
+  if (!ctx) return;
+  if (curveChartInstance) { curveChartInstance.destroy(); }
+  var K = k();
+  var points = [];
+  for (var eth = 200; eth <= 3000; eth += 50) {
+    points.push({ x: eth, y: K / eth / 1000 });
+  }
+  curveChartInstance = new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label: 'Curve', data: points, showLine: true, borderColor: '#185FA5', backgroundColor: 'transparent', pointRadius: 0, borderWidth: 2 },
+        { label: 'Current position', data: [{ x: state.ethReserve, y: state.usdcReserve / 1000 }], pointRadius: 8, pointBackgroundColor: '#E24B4A', borderColor: '#E24B4A', backgroundColor: '#E24B4A' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'ETH in pool', font: { size: 11 }, color: '#888' }, ticks: { color: '#888', font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } },
+        y: { title: { display: true, text: 'USDC (thousands)', font: { size: 11 }, color: '#888' }, ticks: { color: '#888', font: { size: 11 }, callback: v => v + 'k' }, grid: { color: 'rgba(128,128,128,0.1)' } }
+      }
+    }
+  });
+}
+
+var feesChartInstance = null;
+function drawFeesChart() {
+  var ctx = document.getElementById('feesChart');
+  if (!ctx) return;
+  if (feesChartInstance) { feesChartInstance.destroy(); }
+  feesChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: [], datasets: [{ label: 'Daily fees ($)', data: [], backgroundColor: '#1D9E75' }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#888', font: { size: 10 } }, grid: { display: false } },
+        y: { ticks: { color: '#888', font: { size: 11 }, callback: v => '$' + v.toLocaleString() }, grid: { color: 'rgba(128,128,128,0.1)' } }
+      }
+    }
+  });
+}
+
+function runSimulation() {
+  var tradesPerDay = parseInt(document.getElementById('sim-trades').value);
+  var avgSize = parseInt(document.getElementById('sim-size').value);
+  var labels = [], data = [], totalFees = 0;
+  for (var d = 1; d <= 30; d++) {
+    var dayFees = tradesPerDay * avgSize * 0.003;
+    dayFees = dayFees * (0.7 + Math.random() * 0.6);
+    totalFees += dayFees;
+    labels.push('D' + d);
+    data.push(Math.round(dayFees));
+  }
+  if (feesChartInstance) {
+    feesChartInstance.data.labels = labels;
+    feesChartInstance.data.datasets[0].data = data;
+    feesChartInstance.update();
+  }
+  var tvlNow = tvl();
+  var annualFees = totalFees * (365 / 30);
+  var apy = (annualFees / tvlNow * 100).toFixed(1);
+  var summary = document.getElementById('sim-summary');
+  summary.textContent = '30-day fees: $' + fmt(totalFees) + ' | Projected APY: ~' + apy + '% | Per LP token: $' + fmt(totalFees / state.lpSupply, 2);
+  summary.style.display = 'block';
+  summary.className = 'msg msg-info';
+}
+
+updateAllStats();
+setTimeout(drawCurve, 200);
+setTimeout(drawFeesChart, 200);
+</script>
