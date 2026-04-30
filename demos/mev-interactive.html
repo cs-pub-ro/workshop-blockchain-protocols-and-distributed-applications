@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEV & Front-Running — Interactive Demo</title>
+<style>
+:root {
+  --bg: #0a0c12;
+  --surface: #13161f;
+  --surface2: #1d2130;
+  --surface3: #252a3a;
+  --accent: #f59e0b;
+  --accent2: #ef4444;
+  --accent3: #10b981;
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --text: #e8eaf6;
+  --muted: #8892b0;
+  --border: #252a3a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  background: rgba(10,12,18,0.97);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+.nav-logo { font-weight: 800; font-size: 1rem; color: var(--accent); display: flex; align-items: center; gap: 0.5rem; }
+.nav-links { display: flex; gap: 0.2rem; list-style: none; flex-wrap: wrap; }
+.nav-links button {
+  background: none; border: none; color: var(--muted);
+  padding: 0.4rem 0.7rem; border-radius: 6px; cursor: pointer;
+  font-size: 0.82rem; transition: all 0.2s;
+}
+.nav-links button:hover, .nav-links button.active { background: var(--surface2); color: var(--text); }
+.nav-links button.active { color: var(--accent); }
+.progress-bar {
+  position: fixed; top: 60px; left: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width 0.4s ease; z-index: 99;
+}
+
+/* LAYOUT */
+main { padding-top: 80px; max-width: 920px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem; padding-bottom: 80px; }
+.section { display: none; animation: fadeIn 0.4s ease; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+/* TYPOGRAPHY */
+.section-number { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+.section-header { margin-bottom: 2rem; }
+.section-header h2 { font-size: 2rem; font-weight: 800; margin-bottom: 0.7rem; line-height: 1.3; }
+.section-header p { color: var(--muted); font-size: 1rem; line-height: 1.7; max-width: 700px; }
+
+/* HERO */
+.hero { text-align: center; padding: 3rem 1rem 2rem; }
+.hero-badge {
+  display: inline-block; background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.35); color: var(--accent);
+  padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem;
+  font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 1.5rem;
+}
+.hero h1 {
+  font-size: 2.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--accent2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero p { color: var(--muted); font-size: 1.05rem; max-width: 620px; margin: 0 auto 2rem; line-height: 1.7; }
+.hero-start {
+  background: linear-gradient(135deg, var(--accent), #d97706);
+  border: none; color: #000; padding: 0.9rem 2.5rem; border-radius: 10px;
+  font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 24px rgba(245,158,11,0.35);
+}
+.hero-start:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245,158,11,0.5); }
+
+/* CARDS */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1.4rem; margin-bottom: 1.1rem;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: rgba(245,158,11,0.4); }
+.card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.card p { color: var(--muted); line-height: 1.7; font-size: 0.9rem; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+@media (max-width:620px) { .card-grid { grid-template-columns: 1fr; } .hero h1 { font-size: 1.9rem; } }
+
+/* ANALOGY */
+.analogy {
+  background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(239,68,68,0.06));
+  border: 1px solid rgba(245,158,11,0.25); border-radius: 12px; padding: 1.4rem; margin: 1.4rem 0;
+}
+.analogy::before { content: '💡 Real-World Analogy'; display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 0.6rem; }
+.analogy p { color: var(--text); line-height: 1.7; font-size: 0.92rem; }
+
+/* WARNING BOX */
+.warn-box { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25); border-radius: 10px; padding: 1.2rem 1.5rem; margin: 1rem 0; }
+.warn-box h4 { color: var(--accent2); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+.warn-box p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+
+/* GREEN BOX */
+.good-box { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.25); border-radius: 10px; padding: 1.2rem 1.5rem; margin: 1rem 0; }
+.good-box h4 { color: var(--accent3); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+.good-box p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+
+/* TAGS */
+.tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.68rem; font-weight: 700; margin-top: 0.4rem; margin-right: 0.3rem; }
+.tag-yellow { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: var(--accent); }
+.tag-red { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: var(--accent2); }
+.tag-green { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); color: var(--accent3); }
+.tag-blue { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3); color: var(--blue); }
+.tag-purple { background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.3); color: var(--purple); }
+
+/* NAV BTNS */
+.nav-btns { display: flex; justify-content: space-between; margin-top: 2.5rem; gap: 1rem; }
+.btn-prev { padding: 0.7rem 1.6rem; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); cursor: pointer; font-size: 0.88rem; font-weight: 700; transition: all 0.2s; }
+.btn-prev:hover { border-color: var(--accent); }
+.btn-next { padding: 0.7rem 1.6rem; border-radius: 10px; border: none; background: linear-gradient(135deg, var(--accent), #d97706); color: #000; cursor: pointer; font-size: 0.88rem; font-weight: 800; margin-left: auto; transition: all 0.2s; box-shadow: 0 4px 16px rgba(245,158,11,0.3); }
+.btn-next:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245,158,11,0.45); }
+
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+.hl { color: var(--accent); font-weight: 700; }
+.hl2 { color: var(--accent2); font-weight: 700; }
+.hl3 { color: var(--accent3); font-weight: 700; }
+.hl4 { color: var(--blue); font-weight: 700; }
+.hl5 { color: var(--purple); font-weight: 700; }
+
+/* ===== MEMPOOL VISUAL ===== */
+.mempool-container {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 1.5rem; margin: 1.5rem 0;
+}
+.mempool-container h4 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); margin-bottom: 1rem; }
+.mempool-pool {
+  min-height: 130px; background: var(--bg); border: 1px dashed var(--border);
+  border-radius: 10px; padding: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;
+  align-content: flex-start; margin-bottom: 1rem; position: relative;
+}
+.mempool-pool::before { content: 'MEMPOOL (Public Queue)'; position: absolute; top: -10px; left: 12px; background: var(--bg); padding: 0 6px; font-size: 0.65rem; color: var(--muted); font-weight: 700; letter-spacing: 0.05em; }
+.tx-pill {
+  display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem;
+  border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: default;
+  border: 1px solid; animation: popIn 0.3s ease;
+  transition: all 0.3s;
+}
+@keyframes popIn { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+.tx-victim { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.4); color: var(--blue); }
+.tx-attacker-front { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: var(--accent2); }
+.tx-attacker-back { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: var(--accent2); }
+.tx-normal { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.3); color: var(--purple); }
+.tx-miner { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.3); color: var(--accent); }
+
+.gas-badge { font-size: 0.65rem; background: rgba(255,255,255,0.08); border-radius: 4px; padding: 1px 5px; }
+.mempool-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.mp-btn { padding: 0.5rem 1.1rem; border-radius: 8px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: all 0.2s; }
+.mp-btn-primary { background: var(--accent); color: #000; }
+.mp-btn-secondary { background: var(--surface3); color: var(--text); border: 1px solid var(--border); }
+.mp-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.mp-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.mp-status { font-size: 0.82rem; color: var(--muted); margin-top: 0.75rem; min-height: 1.5em; line-height: 1.5; }
+.mp-status span { color: var(--text); }
+
+/* ===== SANDWICH SIMULATOR ===== */
+.sandwich-container {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  overflow: hidden; margin: 1.5rem 0;
+}
+.sandwich-header {
+  background: var(--surface2); padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sandwich-header h4 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); }
+.sandwich-body { padding: 1.5rem; }
+.sandwich-scenario {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;
+}
+@media (max-width:600px) { .sandwich-scenario { grid-template-columns: 1fr; } }
+.scenario-box { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+.scenario-box h5 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
+.scenario-box h5.blue { color: var(--blue); }
+.scenario-box h5.red { color: var(--accent2); }
+.scenario-param { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.4rem; }
+.scenario-param span:first-child { color: var(--muted); }
+.scenario-param span:last-child { font-weight: 700; }
+
+/* Block order viz */
+.block-order { display: flex; flex-direction: column; gap: 0.4rem; margin: 1rem 0; }
+.block-tx {
+  display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;
+  border-radius: 8px; border: 1px solid; font-size: 0.82rem; opacity: 0;
+  transition: all 0.4s ease;
+}
+.block-tx.show { opacity: 1; }
+.block-tx.front { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: var(--accent2); }
+.block-tx.victim { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: var(--blue); }
+.block-tx.back { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: var(--accent2); }
+.block-tx .tx-order { font-size: 0.7rem; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.block-tx.front .tx-order, .block-tx.back .tx-order { background: var(--accent2); color: white; }
+.block-tx.victim .tx-order { background: var(--blue); color: white; }
+.block-tx .tx-detail { flex: 1; }
+.block-tx .tx-result { font-size: 0.72rem; margin-left: auto; font-weight: 700; }
+.block-tx.front .tx-result { color: var(--accent2); }
+.block-tx.victim .tx-result { color: var(--accent2); }
+.block-tx.back .tx-result { color: var(--accent3); }
+
+.sandwich-result {
+  background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 10px; padding: 1rem 1.2rem; margin-top: 1rem; display: none;
+}
+.sandwich-result.show { display: block; animation: fadeIn 0.4s ease; }
+.sandwich-result h5 { color: var(--accent2); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.6rem; }
+.result-row { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.3rem; }
+.result-row span:first-child { color: var(--muted); }
+.result-row span:last-child { font-weight: 700; }
+
+.sandwich-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.sandwich-step-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; min-height: 2em; }
+
+/* ===== FRONTRUN SIMULATOR ===== */
+.frontrun-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin: 1.5rem 0; }
+.frontrun-header { background: var(--surface2); padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.frontrun-header h4 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--purple); }
+.frontrun-body { padding: 1.5rem; }
+
+/* Bot scanning animation */
+.scan-line { width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--accent2), transparent); border-radius: 2px; margin-bottom: 1rem; animation: scan 2s infinite; }
+@keyframes scan { 0%,100% { opacity:0.2; } 50% { opacity:1; } }
+
+.tx-stream { background: var(--bg); border: 1px dashed var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; font-family: 'Courier New', monospace; font-size: 0.75rem; min-height: 110px; overflow-y: auto; }
+.tx-stream .log-line { padding: 0.2rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; gap: 0.5rem; align-items: baseline; }
+.tx-stream .log-time { color: var(--muted); flex-shrink: 0; }
+.tx-stream .log-msg { line-height: 1.4; }
+.log-normal { color: var(--purple); }
+.log-detected { color: var(--accent); }
+.log-bot { color: var(--accent2); }
+.log-included { color: var(--accent3); }
+
+.frontrun-stages { display: flex; gap: 0; margin: 1rem 0; overflow-x: auto; }
+.stage {
+  flex: 1; min-width: 120px; padding: 0.8rem; text-align: center;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 0;
+  border-right: none; font-size: 0.75rem; opacity: 0.4; transition: all 0.4s;
+}
+.stage:first-child { border-radius: 8px 0 0 8px; }
+.stage:last-child { border-right: 1px solid var(--border); border-radius: 0 8px 8px 0; }
+.stage.active { opacity: 1; border-color: var(--accent2); background: rgba(239,68,68,0.08); }
+.stage.done { opacity: 0.7; border-color: var(--accent3); background: rgba(16,185,129,0.06); }
+.stage .s-icon { font-size: 1.4rem; margin-bottom: 0.3rem; display: block; }
+.stage .s-label { font-weight: 700; color: var(--text); margin-bottom: 0.2rem; }
+.stage .s-sub { color: var(--muted); font-size: 0.68rem; }
+
+/* ===== ARB CALCULATOR ===== */
+.arb-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin: 1.5rem 0; }
+.arb-box h4 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent3); margin-bottom: 1.2rem; }
+.arb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+@media (max-width:600px) { .arb-grid { grid-template-columns: 1fr; } }
+.arb-exchange { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+.arb-exchange h5 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+.price-big { font-size: 2rem; font-weight: 800; margin-bottom: 0.3rem; }
+.price-big.higher { color: var(--accent3); }
+.price-big.lower { color: var(--accent2); }
+.arb-slider { width: 100%; margin: 0.5rem 0; }
+.arb-result { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: 10px; padding: 1rem 1.2rem; }
+.arb-result h5 { color: var(--accent3); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.6rem; }
+.arb-rows { display: flex; flex-direction: column; gap: 0.3rem; }
+.arb-row { display: flex; justify-content: space-between; font-size: 0.82rem; }
+.arb-row span:first-child { color: var(--muted); }
+.arb-row span:last-child { font-weight: 700; }
+
+/* ===== QUIZ ===== */
+.quiz-q { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; margin-bottom: 1.4rem; }
+.quiz-q .q-num { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 0.4rem; }
+.quiz-q h3 { font-size: 0.97rem; font-weight: 700; margin-bottom: 0.9rem; line-height: 1.5; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+.quiz-opt {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.75rem 1rem; cursor: pointer; font-size: 0.88rem; color: var(--text);
+  text-align: left; transition: all 0.2s; line-height: 1.4;
+}
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); background: var(--surface3); }
+.quiz-opt.correct { border-color: var(--accent3); background: rgba(16,185,129,0.1); color: var(--accent3); }
+.quiz-opt.wrong { border-color: var(--accent2); background: rgba(239,68,68,0.1); color: var(--accent2); }
+.quiz-feedback { margin-top: 0.7rem; font-size: 0.83rem; line-height: 1.5; padding: 0.65rem 0.9rem; border-radius: 8px; display: none; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: rgba(16,185,129,0.08); color: var(--accent3); border: 1px solid rgba(16,185,129,0.2); }
+.quiz-feedback.wrong { background: rgba(239,68,68,0.08); color: var(--accent2); border: 1px solid rgba(239,68,68,0.2); }
+
+/* SCORE */
+.score-box { text-align: center; background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(16,185,129,0.08)); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; margin-top: 1rem; display: none; }
+.score-box.show { display: block; animation: fadeIn 0.5s ease; }
+.score-num { font-size: 4rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 0.5rem; }
+.score-label { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.5rem; }
+.score-msg { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+
+/* TABLE */
+.tbl { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin: 1.2rem 0; }
+.tbl th { background: var(--surface2); padding: 0.7rem 0.9rem; text-align: left; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 1px solid var(--border); }
+.tbl td { padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; line-height: 1.5; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: rgba(245,158,11,0.04); }
+
+/* CHECKLIST */
+.checklist { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; margin: 1.2rem 0; }
+.checklist li { display: flex; align-items: flex-start; gap: 0.7rem; font-size: 0.9rem; color: var(--text); line-height: 1.5; }
+.checklist li::before { content: '→'; color: var(--accent); font-weight: 900; flex-shrink: 0; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">⚡ MEV Module</div>
+  <ul class="nav-links">
+    <li><button onclick="goTo(0)" id="nav0" class="active">Intro</button></li>
+    <li><button onclick="goTo(1)" id="nav1">What is MEV?</button></li>
+    <li><button onclick="goTo(2)" id="nav2">Mempool</button></li>
+    <li><button onclick="goTo(3)" id="nav3">Front-Running</button></li>
+    <li><button onclick="goTo(4)" id="nav4">Sandwich</button></li>
+    <li><button onclick="goTo(5)" id="nav5">Arbitrage</button></li>
+    <li><button onclick="goTo(6)" id="nav6">Mitigations</button></li>
+    <li><button onclick="goTo(7)" id="nav7">Quiz</button></li>
+  </ul>
+</nav>
+<div class="progress-bar" id="progress"></div>
+
+<main>
+
+<!-- ===== 0. INTRO ===== -->
+<section class="section active" id="s0">
+  <div class="hero">
+    <div class="hero-badge">⚡ Blockchain Workshop — MEV & Front-Running</div>
+    <h1>Maximal Extractable Value</h1>
+    <p>Every second, bots silently profit by reordering, inserting, and censoring transactions before they're confirmed. This is MEV — the hidden tax on every blockchain user.</p>
+    <button class="hero-start" onclick="goTo(1)">Start Learning →</button>
+  </div>
+
+  <div class="card-grid" style="margin-top:1.5rem">
+    <div class="card">
+      <h3>⚡ MEV Extracted to Date</h3>
+      <p>Over <span class="hl">$1.5 billion</span> has been extracted from Ethereum users since 2020 — through front-running, sandwich attacks, and arbitrage.</p>
+    </div>
+    <div class="card">
+      <h3>🤖 The Competition</h3>
+      <p>Hundreds of bots compete millisecond-by-millisecond to detect and exploit profitable opportunities in the mempool.</p>
+    </div>
+    <div class="card">
+      <h3>👀 Fully Transparent</h3>
+      <p>Unlike traditional markets, all unconfirmed transactions are <span class="hl">publicly visible</span> before they execute — making them exploitable by anyone.</p>
+    </div>
+    <div class="card">
+      <h3>🎮 Interactive Demos</h3>
+      <p>Simulate a sandwich attack, watch a front-running bot in action, and calculate arbitrage profit — all in your browser.</p>
+    </div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn-next" onclick="goTo(1)">What is MEV? →</button>
+  </div>
+</section>
+
+<!-- ===== 1. WHAT IS MEV ===== -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <div class="section-number">01 / 07 — Concept</div>
+    <h2>What is MEV?</h2>
+    <p><strong>Maximal Extractable Value</strong> (formerly "Miner Extractable Value") is the maximum profit that can be extracted by controlling the <em>order of transactions</em> within a block — beyond standard block rewards and gas fees.</p>
+  </div>
+
+  <div class="card">
+    <h3>🧱 Who Controls Transaction Order?</h3>
+    <p>In a blockchain, a <span class="hl">validator (or miner)</span> decides which transactions to include in a block and in what order. Normally this is based on gas fees — highest gas = first in. But a validator can also <em>reorder, insert, or exclude</em> transactions to profit from price effects. Sophisticated bots (called <span class="hl">"searchers"</span>) detect opportunities and pay high gas fees to validators to get their transactions placed optimally.</p>
+  </div>
+
+  <div class="analogy">
+    <p>Imagine you're at a stock exchange in the 1980s — <span class="hl">before electronic trading</span>. You submit a buy order for 10,000 shares through a broker. The broker can see your order before executing it. They quickly buy shares for their own account first, driving the price up slightly — then fill your order at the higher price, then sell their shares. You got a slightly worse deal; they pocketed the difference. This is front-running — and blockchains make it even easier because <em>every pending transaction is publicly visible</em>.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>🔍 Who Are the Searchers?</h3>
+      <p>Bots run by sophisticated traders and firms. They monitor the mempool 24/7, identify profitable opportunities, and submit transactions with precisely calibrated gas prices — often within milliseconds of detecting a target transaction.</p>
+    </div>
+    <div class="card">
+      <h3>⛏️ Who Are the Validators?</h3>
+      <p>Block producers who actually include transactions. Searchers pay them via high gas fees (or direct "tips" via MEV-Boost) to get their sandwiching/front-running transactions included in the right position.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem">📊 Main Types of MEV</h3>
+  <table class="tbl">
+    <thead><tr><th>Type</th><th>How It Works</th><th>Winner/Loser</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Front-running</strong></td><td>Copy a pending profitable tx and submit it first with higher gas</td><td>🤖 Bot wins / 😢 Original user loses opportunity</td></tr>
+      <tr><td><strong>Sandwich Attack</strong></td><td>Wrap a victim's DEX swap with a buy-before and sell-after</td><td>🤖 Bot profits / 😢 Victim gets worse price</td></tr>
+      <tr><td><strong>Arbitrage</strong></td><td>Exploit price differences between DEXes in one transaction</td><td>🤖 Bot profits / 🟡 Neutral (helps price efficiency)</td></tr>
+      <tr><td><strong>Liquidations</strong></td><td>Race to liquidate under-collateralized DeFi loans first</td><td>🤖 Bot earns bonus / 😢 Borrower loses extra collateral</td></tr>
+      <tr><td><strong>Time-bandit</strong></td><td>Validator reorganizes past blocks to steal profitable txs</td><td>🤖 Validator profits / 😢 Chain security weakened</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(0)">← Back</button>
+    <button class="btn-next" onclick="goTo(2)">The Mempool →</button>
+  </div>
+</section>
+
+<!-- ===== 2. MEMPOOL ===== -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <div class="section-number">02 / 07 — The Mempool</div>
+    <h2>The Public Waiting Room</h2>
+    <p>Before a transaction is confirmed in a block, it lives in the <strong>mempool</strong> — a publicly visible queue of pending transactions. This transparency is what makes MEV possible.</p>
+  </div>
+
+  <div class="card">
+    <h3>📋 What is the Mempool?</h3>
+    <p>Every node on the network keeps a local copy of the <span class="hl">memory pool</span> — a list of valid, unconfirmed transactions waiting to be included in the next block. Since it's public, <em>anyone</em> can see every pending transaction, including what assets someone is trying to buy, at what price, and with what slippage tolerance.</p>
+  </div>
+
+  <div class="analogy">
+    <p>The mempool is like a <span class="hl">glass-walled trading floor</span>. Everyone outside can see exactly what orders are being placed before they're executed. In traditional finance, this information would be strictly protected. In a public blockchain, it's visible to the entire world — including sophisticated bots looking for an edge.</p>
+  </div>
+
+  <!-- Interactive Mempool Demo -->
+  <div class="mempool-container">
+    <h4>🎮 Interactive — Watch the Mempool in Action</h4>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem">Click the buttons below to simulate transactions entering the mempool, a bot detecting a victim transaction, and the final block being assembled.</p>
+
+    <div class="mempool-pool" id="mempoolPool">
+      <span style="color:var(--muted);font-size:0.78rem;padding:0.5rem">Mempool is empty — add transactions to begin</span>
+    </div>
+
+    <div class="mempool-controls">
+      <button class="mp-btn mp-btn-secondary" id="btnAddNormal" onclick="addNormalTx()">+ Add Normal Transactions</button>
+      <button class="mp-btn mp-btn-secondary" id="btnAddVictim" onclick="addVictimTx()" disabled>+ Victim Swap Appears</button>
+      <button class="mp-btn mp-btn-primary" id="btnBotDetect" onclick="botDetect()" disabled>🤖 Bot Scans Mempool</button>
+      <button class="mp-btn mp-btn-secondary" id="btnMineBlock" onclick="mineBlock()" disabled>⛏️ Build Block</button>
+      <button class="mp-btn mp-btn-secondary" onclick="resetMempool()">↺ Reset</button>
+    </div>
+    <div class="mp-status" id="mpStatus">Step 1: Add some normal transactions to populate the mempool.</div>
+  </div>
+
+  <div class="card">
+    <h3>🔍 What Does a Bot Actually See?</h3>
+    <p>When Alice submits a transaction to swap 10 ETH for USDC on Uniswap, the bot sees: <span class="hl">the exact function call</span>, the amount in, the minimum amount out (slippage tolerance), the target contract address, the gas price. From slippage tolerance alone, the bot can calculate <em>exactly how much it can exploit Alice's trade</em>.</p>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(1)">← Back</button>
+    <button class="btn-next" onclick="goTo(3)">Front-Running →</button>
+  </div>
+</section>
+
+<!-- ===== 3. FRONT-RUNNING ===== -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <div class="section-number">03 / 07 — Attack Type 1</div>
+    <h2>Front-Running</h2>
+    <p>The simplest and oldest MEV attack. A bot sees a profitable pending transaction and races to execute the <em>same opportunity</em> first by paying a higher gas fee.</p>
+  </div>
+
+  <div class="card">
+    <h3>🏃 How Front-Running Works</h3>
+    <p>Alice discovers an NFT minting opportunity at a below-market price — 1 ETH for an NFT worth 3 ETH. She submits a transaction. A bot monitoring the mempool sees Alice's transaction, recognizes the profit, and immediately submits the same transaction with a <span class="hl">higher gas price</span>. The validator includes the higher-gas transaction first. The bot mints the NFT; Alice's transaction fails (the NFT is already minted).</p>
+  </div>
+
+  <!-- Front-run simulator -->
+  <div class="frontrun-wrap">
+    <div class="frontrun-header">
+      <h4>🤖 Front-Running Bot Simulator</h4>
+      <button onclick="runFrontrun()" id="btnFrontrun" class="mp-btn mp-btn-primary" style="font-size:0.78rem">▶ Run Simulation</button>
+    </div>
+    <div class="frontrun-body">
+      <div class="frontrun-stages">
+        <div class="stage" id="stage0"><span class="s-icon">📝</span><div class="s-label">Alice submits</div><div class="s-sub">1 ETH → NFT</div></div>
+        <div class="stage" id="stage1"><span class="s-icon">📡</span><div class="s-label">Mempool public</div><div class="s-sub">Everyone can see</div></div>
+        <div class="stage" id="stage2"><span class="s-icon">🤖</span><div class="s-label">Bot detects</div><div class="s-sub">&lt; 1ms reaction</div></div>
+        <div class="stage" id="stage3"><span class="s-icon">⛽</span><div class="s-label">Bot outbids</div><div class="s-sub">Higher gas</div></div>
+        <div class="stage" id="stage4"><span class="s-icon">🧱</span><div class="s-label">Block built</div><div class="s-sub">Bot tx first</div></div>
+        <div class="stage" id="stage5"><span class="s-icon">💸</span><div class="s-label">Result</div><div class="s-sub">Bot wins, Alice fails</div></div>
+      </div>
+
+      <div class="tx-stream" id="txStream">
+        <div style="color:var(--muted);font-size:0.78rem">Click "Run Simulation" to watch the attack unfold...</div>
+      </div>
+
+      <div class="block-order" id="frontrunBlock" style="display:none">
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.4rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Final Block Order:</div>
+        <div class="block-tx front" id="fr-tx1">
+          <div class="tx-order">1</div>
+          <div class="tx-detail"><strong>Bot's Tx</strong> — Mint NFT @ 1 ETH · Gas: 180 Gwei</div>
+          <div class="tx-result">✓ SUCCESS — Bot owns NFT</div>
+        </div>
+        <div class="block-tx victim" id="fr-tx2">
+          <div class="tx-order">2</div>
+          <div class="tx-detail"><strong>Alice's Tx</strong> — Mint NFT @ 1 ETH · Gas: 50 Gwei</div>
+          <div class="tx-result">✗ FAIL — Already minted</div>
+        </div>
+      </div>
+
+      <div id="frontrunResult" style="display:none;margin-top:1rem;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:1rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem"><span style="color:var(--muted)">Bot paid (NFT price + gas)</span><span style="font-weight:700">1.05 ETH</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem"><span style="color:var(--muted)">NFT market value</span><span style="font-weight:700">3.00 ETH</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem;border-top:1px solid var(--border);padding-top:0.4rem;margin-top:0.4rem"><span style="color:var(--muted)">Bot instant profit</span><span style="font-weight:700;color:var(--accent2)">+1.95 ETH 🤖</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem"><span style="color:var(--muted)">Alice's outcome</span><span style="font-weight:700;color:var(--accent2)">Lost gas fees, missed opportunity 😢</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <p>In traditional finance, front-running by brokers is <span class="hl2">illegal</span> under securities law — it's a breach of fiduciary duty. In blockchain, it's a <span class="hl">structural feature of public mempools</span>. No law is broken; the system design permits it. This is why many see it as an inherent flaw in public blockchains.</p>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(2)">← Back</button>
+    <button class="btn-next" onclick="goTo(4)">Sandwich Attack →</button>
+  </div>
+</section>
+
+<!-- ===== 4. SANDWICH ===== -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <div class="section-number">04 / 07 — Attack Type 2</div>
+    <h2>The Sandwich Attack</h2>
+    <p>The most common MEV attack targeting DEX traders. The attacker wraps the victim's swap in two transactions — buying before and selling after — guaranteeing a profit at the victim's expense.</p>
+  </div>
+
+  <div class="card">
+    <h3>🥪 The Mechanics</h3>
+    <p>Bob wants to swap 10 ETH for USDC on Uniswap. The bot sees his pending transaction. It knows Bob set a 1% slippage tolerance. So the bot:</p>
+  </div>
+
+  <ul class="checklist" style="margin-top:-0.5rem">
+    <li><strong>Front-run</strong>: Bot buys ETH with USDC before Bob — this raises ETH's price in the pool</li>
+    <li><strong>Victim executes</strong>: Bob's swap goes through at the now-higher price (within his slippage tolerance)</li>
+    <li><strong>Back-run</strong>: Bot immediately sells the ETH it just bought — now at the higher price Bob helped create</li>
+    <li>Bot pockets the difference. Bob got a worse rate than necessary.</li>
+  </ul>
+
+  <!-- Sandwich Simulator -->
+  <div class="sandwich-container">
+    <div class="sandwich-header">
+      <h4>🥪 Sandwich Attack Simulator</h4>
+      <span style="font-size:0.75rem;color:var(--muted)">Step through the attack</span>
+    </div>
+    <div class="sandwich-body">
+      <div class="sandwich-scenario">
+        <div class="scenario-box">
+          <h5 class="blue">🙎 Bob (Victim)</h5>
+          <div class="scenario-param"><span>Swapping</span><span>10 ETH</span></div>
+          <div class="scenario-param"><span>For (target)</span><span>USDC</span></div>
+          <div class="scenario-param"><span>ETH price (fair)</span><span id="fairPrice">$2,000</span></div>
+          <div class="scenario-param"><span>Slippage tolerance</span><span id="slippagePct">1.0%</span></div>
+          <div class="scenario-param"><span>Expected USDC</span><span id="expectedOut">$20,000</span></div>
+          <div class="scenario-param"><span>Min acceptable</span><span id="minOut">$19,800</span></div>
+        </div>
+        <div class="scenario-box">
+          <h5 class="red">🤖 Attacker Bot</h5>
+          <div class="scenario-param"><span>Front-run buy</span><span>USDC → ETH</span></div>
+          <div class="scenario-param"><span>Amount</span><span id="botBuyAmt">$18,000</span></div>
+          <div class="scenario-param"><span>Price after front-run</span><span id="priceAfterFront">$2,018</span></div>
+          <div class="scenario-param"><span>Bob's actual price</span><span id="bobActualPrice">$2,016</span></div>
+          <div class="scenario-param"><span>Bob's USDC received</span><span id="bobActualOut" style="color:var(--accent2)">$19,840</span></div>
+          <div class="scenario-param"><span>Bot profit</span><span id="botProfit" style="color:var(--accent2)">~$160</span></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:1rem">
+        <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.4rem">Bob's Slippage Tolerance: <strong id="slipLabel">1.0%</strong> — (higher = more vulnerable)</label>
+        <input type="range" min="0.5" max="5" step="0.1" value="1.0" oninput="updateSlippage(this.value)" style="width:100%;accent-color:var(--accent2)">
+      </div>
+
+      <div class="block-order" id="sandwichBlock">
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.4rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em">Block Execution Order:</div>
+        <div class="block-tx front" id="sw-tx1" style="opacity:0.3">
+          <div class="tx-order">1</div>
+          <div class="tx-detail"><strong>Bot FRONT-RUN</strong> — Buy ETH with $18,000 USDC · Gas: 200 Gwei</div>
+          <div class="tx-result" id="sw-tx1-r">↑ ETH price rises</div>
+        </div>
+        <div class="block-tx victim" id="sw-tx2" style="opacity:0.3">
+          <div class="tx-order">2</div>
+          <div class="tx-detail" id="sw-tx2-d"><strong>Bob's SWAP</strong> — 10 ETH → USDC · Gas: 50 Gwei · Slippage 1%</div>
+          <div class="tx-result" id="sw-tx2-r">Executes at worse price</div>
+        </div>
+        <div class="block-tx back" id="sw-tx3" style="opacity:0.3">
+          <div class="tx-order">3</div>
+          <div class="tx-detail"><strong>Bot BACK-RUN</strong> — Sell ETH back for USDC · Gas: 199 Gwei</div>
+          <div class="tx-result" id="sw-tx3-r">Bot pockets spread</div>
+        </div>
+      </div>
+
+      <div id="sandwichFinalResult" class="sandwich-result">
+        <h5>💸 Attack Result</h5>
+        <div class="result-row"><span>Bob expected to receive</span><span id="r-expected">$20,000 USDC</span></div>
+        <div class="result-row"><span>Bob actually received</span><span id="r-actual" style="color:var(--accent2)">$19,840 USDC</span></div>
+        <div class="result-row"><span>Bob's loss (MEV tax)</span><span id="r-loss" style="color:var(--accent2)">-$160 USDC</span></div>
+        <div class="result-row" style="border-top:1px solid rgba(239,68,68,0.2);padding-top:0.4rem;margin-top:0.4rem"><span>Bot's gross profit</span><span id="r-profit" style="color:var(--accent3)">+$160 USDC</span></div>
+      </div>
+
+      <div class="sandwich-controls" style="margin-top:1rem">
+        <button class="mp-btn mp-btn-primary" onclick="runSandwich()">▶ Animate Attack</button>
+        <button class="mp-btn mp-btn-secondary" onclick="resetSandwich()">↺ Reset</button>
+      </div>
+      <div class="sandwich-step-label" id="sandwichStepLabel"></div>
+    </div>
+  </div>
+
+  <div class="warn-box">
+    <h4>📊 Scale of Sandwich Attacks</h4>
+    <p>On busy days, sandwich bots extract <strong>millions of dollars</strong> from DEX traders. The average victim loses 0.1%–2% of their swap value to MEV. For small traders, this is often more costly than the gas fees themselves. Uniswap estimates MEV costs users hundreds of millions of dollars per year.</p>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(3)">← Back</button>
+    <button class="btn-next" onclick="goTo(5)">MEV Arbitrage →</button>
+  </div>
+</section>
+
+<!-- ===== 5. ARBITRAGE ===== -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <div class="section-number">05 / 07 — Attack Type 3</div>
+    <h2>MEV Arbitrage</h2>
+    <p>Not all MEV is harmful. <strong>Arbitrage</strong> — exploiting price differences between exchanges — actually improves market efficiency. But it's still extractive for the traders who created those price differences.</p>
+  </div>
+
+  <div class="card">
+    <h3>⚖️ How DEX Arbitrage Works</h3>
+    <p>When a large trade on Uniswap pushes ETH's price to $2,050 while it's still $2,000 on SushiSwap, arbitrage bots instantly buy ETH on SushiSwap and sell on Uniswap — making a risk-free profit and equalizing prices across venues. This is economically <span class="hl3">beneficial</span> — it keeps prices aligned. But the bots take the profit rather than the original trader who moved the price.</p>
+  </div>
+
+  <div class="analogy">
+    <p>Think of international currency traders who exploit <span class="hl">exchange rate discrepancies</span> between banks in different cities. When one bank quotes USD/EUR at 1.08 and another at 1.085, traders profit from the difference, and in doing so, force prices back into alignment. Blockchain arbitrage works identically — except it all happens in milliseconds within a single block.</p>
+  </div>
+
+  <!-- Arbitrage Calculator -->
+  <div class="arb-box">
+    <h4>🎮 Arbitrage Opportunity Calculator</h4>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem">Adjust the ETH price on each DEX to see when an arbitrage opportunity emerges and how much profit a bot can extract.</p>
+
+    <div class="arb-grid">
+      <div class="arb-exchange">
+        <h5>Uniswap V3</h5>
+        <div class="price-big" id="uniPrice">$2,000</div>
+        <input type="range" class="arb-slider" min="1800" max="2400" step="5" value="2000" oninput="updateArb('uni', this.value)" style="accent-color:var(--blue)">
+        <div style="font-size:0.72rem;color:var(--muted)">Drag to adjust price</div>
+      </div>
+      <div class="arb-exchange">
+        <h5>SushiSwap</h5>
+        <div class="price-big" id="sushiPrice">$2,000</div>
+        <input type="range" class="arb-slider" min="1800" max="2400" step="5" value="2000" oninput="updateArb('sushi', this.value)" style="accent-color:var(--purple)">
+        <div style="font-size:0.72rem;color:var(--muted)">Drag to adjust price</div>
+      </div>
+    </div>
+
+    <div class="arb-result" id="arbResult">
+      <h5 id="arbTitle">No Opportunity</h5>
+      <div class="arb-rows" id="arbRows">
+        <div class="arb-row"><span>Price spread</span><span id="arbSpread">$0.00 (0.00%)</span></div>
+        <div class="arb-row"><span>Trade size (100 ETH)</span><span id="arbTradeSize">—</span></div>
+        <div class="arb-row"><span>Gross profit</span><span id="arbProfit">—</span></div>
+        <div class="arb-row"><span>Gas cost (est.)</span><span id="arbGas">—</span></div>
+        <div class="arb-row"><span>Net profit</span><span id="arbNet" style="font-weight:800">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-grid" style="margin-top:1rem">
+    <div class="card">
+      <h3 style="color:var(--accent3)">✅ "Good" MEV</h3>
+      <p>Pure arbitrage between DEXes brings prices into alignment, reducing information asymmetry and making markets more efficient. The value is extracted mostly from price inefficiency, not individual users.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--accent2)">❌ "Bad" MEV</h3>
+      <p>Sandwich attacks and front-running directly extract value from individual users — giving them worse prices than they should have received. This is a regressive "invisible tax" that harms ordinary users most.</p>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(4)">← Back</button>
+    <button class="btn-next" onclick="goTo(6)">Mitigations →</button>
+  </div>
+</section>
+
+<!-- ===== 6. MITIGATIONS ===== -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <div class="section-number">06 / 07 — Solutions</div>
+    <h2>Fighting Back Against MEV</h2>
+    <p>The Ethereum ecosystem has developed a range of technical and market-based solutions to reduce harmful MEV — though none eliminate it entirely.</p>
+  </div>
+
+  <div class="card">
+    <h3>🤫 Private Mempools (MEV Blocker / Flashbots Protect)</h3>
+    <p>Instead of broadcasting your transaction to the public mempool, you send it directly to a validator via a <span class="hl">private channel</span>. Bots can't see it, so they can't front-run or sandwich it. Services like <strong>Flashbots Protect</strong> and <strong>MEV Blocker</strong> do this automatically when you use them as your RPC endpoint in MetaMask.</p>
+    <span class="tag-green tag">Used today</span><span class="tag-blue tag">Free to users</span>
+  </div>
+
+  <div class="card">
+    <h3>📦 MEV-Boost & Flashbots</h3>
+    <p>Rather than eliminating MEV, Flashbots <em>democratizes and makes it transparent</em>. Searchers submit "bundles" of transactions to a centralized relay (Flashbots). Validators receive these bundles and include the most profitable ones. Profits are shared between searchers and validators. This reduces chaotic "gas wars" and prevents the worst forms of blockchain congestion from MEV competition.</p>
+    <span class="tag-yellow tag">Dominant infrastructure</span><span class="tag-purple tag">~90% of Ethereum blocks</span>
+  </div>
+
+  <div class="card">
+    <h3>🔁 Commit-Reveal Schemes</h3>
+    <p>Users submit a <span class="hl">cryptographic hash</span> of their transaction first (the "commit"), then reveal the actual transaction in the next block. Since bots can only see the hash — not the content — they can't act on it. Tradeoff: adds latency (two transactions required) and complexity.</p>
+    <span class="tag-blue tag">Cryptographic protection</span>
+  </div>
+
+  <div class="card">
+    <h3>🕐 Time-Weighted Average Price (TWAP)</h3>
+    <p>Use the <span class="hl">average price over many blocks</span> rather than the instantaneous price. Since a bot would need to manipulate the price across many blocks to move a TWAP — and that would be astronomically expensive — TWAP-based protocols are much more MEV-resistant for oracle attacks.</p>
+    <span class="tag-green tag">DeFi standard</span>
+  </div>
+
+  <div class="card">
+    <h3>🔀 Fair Ordering (Chainlink FSS)</h3>
+    <p>A decentralized ordering system where transactions are ordered by their <em>arrival time</em> at the network — not by gas fee. Validators lose the ability to reorder transactions for profit. Still largely experimental, but promising for eliminating ordering-based MEV entirely.</p>
+    <span class="tag-yellow tag">Experimental</span>
+  </div>
+
+  <div class="card">
+    <h3>🔒 Slippage Protection (as a user)</h3>
+    <p>Set your <span class="hl">slippage tolerance as low as possible</span> when swapping on DEXes. A 0.1% slippage gives sandwichers almost no room to profit — they can't squeeze any value within such a tight band. The tradeoff: your transaction might fail during volatile markets.</p>
+    <span class="tag-green tag">Actionable now</span>
+  </div>
+
+  <hr class="divider">
+
+  <div class="warn-box">
+    <h4>⚠️ The Fundamental Tension</h4>
+    <p>MEV is ultimately caused by the combination of <strong>public mempools + miner/validator control over transaction ordering</strong>. Solving it fully means sacrificing either transparency (private mempools) or validator freedom (mandatory ordering rules) — both of which have trade-offs for decentralization and censorship resistance.</p>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(5)">← Back</button>
+    <button class="btn-next" onclick="goTo(7)">Take the Quiz →</button>
+  </div>
+</section>
+
+<!-- ===== 7. QUIZ ===== -->
+<section class="section" id="s7">
+  <div class="section-header">
+    <div class="section-number">07 / 07 — Quiz</div>
+    <h2>Test Your MEV Knowledge 🧠</h2>
+    <p>6 questions. Click an answer for instant feedback.</p>
+  </div>
+
+  <div class="quiz-q">
+    <div class="q-num">Question 1 of 6</div>
+    <h3>What does "MEV" stand for, and what does it measure?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="ansQ(this,false,'q1','Incorrect. MEV is about transaction ordering, not mining equipment efficiency.')">A) Mining Equipment Velocity — the speed of mining hardware</button>
+      <button class="quiz-opt" onclick="ansQ(this,true,'q1','Correct! MEV (Maximal Extractable Value) is the maximum profit extractable from controlling the ordering of transactions within a block — beyond normal block rewards and gas fees.')">B) Maximal Extractable Value — profit from controlling transaction ordering in a block</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q1','Incorrect. MEV is not a fee standard — it\'s a category of extractable profit.')">C) Minimum Exchange Value — the floor price of a token on an exchange</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q1','Incorrect. Market Efficiency Variance relates to traditional finance theory, not blockchain.')">D) Market Efficiency Variance — how efficiently markets price assets</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q1"></div>
+  </div>
+
+  <div class="quiz-q">
+    <div class="q-num">Question 2 of 6</div>
+    <h3>Why is the blockchain mempool the key enabler of MEV attacks like front-running?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="ansQ(this,false,'q2','Incorrect. The mempool contains validated transactions — invalid ones are rejected before entering.')">A) The mempool contains unvalidated transactions that can be stolen</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q2','Incorrect. The mempool is very fast — the problem is visibility, not speed.')">B) The mempool is slow, giving bots time to react</button>
+      <button class="quiz-opt" onclick="ansQ(this,true,'q2','Correct! The mempool is public — anyone can see the full details of every pending transaction (what asset is being bought, the amount, slippage tolerance) before it\'s confirmed. This allows bots to identify and exploit profitable transactions before they execute.')">C) The mempool is publicly visible, so bots can see pending transactions before they are confirmed and act on them</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q2','Incorrect. Mempools do not encrypt transactions — they are fully transparent.')">D) The mempool encrypts transactions poorly, allowing bots to decrypt them</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q2"></div>
+  </div>
+
+  <div class="quiz-q">
+    <div class="q-num">Question 3 of 6</div>
+    <h3>In a sandwich attack, what is the exact sequence of transactions in the block?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="ansQ(this,false,'q3','Incorrect. In a sandwich, the victim\'s transaction is in the middle, not last.')">A) Victim → Bot buy → Bot sell</button>
+      <button class="quiz-opt" onclick="ansQ(this,true,'q3','Correct! The bot\'s buy comes first (driving price up), then the victim\'s swap executes at the worsened price, then the bot sells at the inflated price. The victim\'s transaction is literally "sandwiched" between the two bot transactions.')">B) Bot buy → Victim swap → Bot sell</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q3','Incorrect. This would be arbitrage, not a sandwich attack.')">C) Bot buy → Bot sell → Victim swap</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q3','Incorrect. The bot always needs to buy before the victim to move the price against them.')">D) Victim swap → Bot buy → Bot sell</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q3"></div>
+  </div>
+
+  <div class="quiz-q">
+    <div class="q-num">Question 4 of 6</div>
+    <h3>A DEX trader sets their slippage tolerance to 5%. How does this affect their vulnerability to sandwich attacks?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="ansQ(this,false,'q4','Incorrect. Higher slippage tolerance makes you MORE vulnerable, not less.')">A) It makes them less vulnerable — they accept more price variance</button>
+      <button class="quiz-opt" onclick="ansQ(this,true,'q4','Correct! A 5% slippage tolerance means the bot can move the price against the victim by up to 5% and the transaction will still succeed. This is a huge sandbox for the bot to extract profit. Lower slippage (0.1%-0.5%) leaves bots almost no room to sandwich profitably.')">B) It makes them much more vulnerable — the bot has up to 5% of room to extract value</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q4','Incorrect. Slippage tolerance has a direct relationship with sandwich attack profitability.')">C) Slippage tolerance has no effect on sandwich attack profitability</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q4','Incorrect. High slippage means the transaction is more likely to succeed even after price manipulation — not less.')">D) High slippage causes the transaction to fail, protecting the user</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q4"></div>
+  </div>
+
+  <div class="quiz-q">
+    <div class="q-num">Question 5 of 6</div>
+    <h3>Which form of MEV is generally considered "beneficial" to the market?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="ansQ(this,false,'q5','Incorrect. Sandwich attacks extract pure value from individual users with no market benefit.')">A) Sandwich attacks, because they improve liquidity</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q5','Incorrect. Front-running NFT mints harms the original discoverer and provides no market efficiency benefit.')">B) NFT front-running, because it ensures fair price discovery</button>
+      <button class="quiz-opt" onclick="ansQ(this,true,'q5','Correct! DEX arbitrage equalizes prices across venues, reducing information asymmetry and improving overall market efficiency — similar to traditional arbitrage in FX or equity markets. While bots profit, the result is tighter price alignment across the ecosystem.')">C) DEX arbitrage, because it equalizes prices across exchanges and improves market efficiency</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q5','Incorrect. Time-bandit attacks threaten blockchain consensus security — they are harmful.')">D) Time-bandit attacks, because they improve blockchain throughput</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q5"></div>
+  </div>
+
+  <div class="quiz-q">
+    <div class="q-num">Question 6 of 6</div>
+    <h3>What is the main protection offered by Flashbots Protect / MEV Blocker for regular users?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="ansQ(this,false,'q6','Incorrect. These services route to specific validators privately — not all validators.')">A) They send your transaction to all validators simultaneously to guarantee inclusion</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q6','Incorrect. These services do not reduce gas fees — they change the routing of transactions.')">B) They reduce gas fees by 90%</button>
+      <button class="quiz-opt" onclick="ansQ(this,true,'q6','Correct! By bypassing the public mempool, these services prevent bots from seeing your transaction before it\'s confirmed. No visibility = no front-running or sandwiching. Your transaction goes directly from your wallet to a validator via a private channel.')">C) They bypass the public mempool, so bots cannot see — and therefore cannot front-run or sandwich — your transaction</button>
+      <button class="quiz-opt" onclick="ansQ(this,false,'q6','Incorrect. MEV Blocker does not encrypt transactions — it routes them privately to avoid the public mempool.')">D) They encrypt your transaction so bots cannot read it in the mempool</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q6"></div>
+  </div>
+
+  <div class="score-box" id="scoreBox">
+    <div class="score-num" id="scoreNum">0/6</div>
+    <div class="score-label">correct answers</div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <p id="scoreSubMsg" style="color:var(--muted);font-size:0.88rem;margin-top:0.3rem"></p>
+    <button onclick="restartQuiz()" style="margin-top:1.5rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:0.7rem 1.5rem;border-radius:8px;cursor:pointer;font-size:0.88rem;font-weight:700">🔄 Retry Quiz</button>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(6)">← Back</button>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ===== NAV =====
+let current = 0;
+const TOTAL = 8;
+function goTo(n) {
+  document.getElementById('s'+current).classList.remove('active');
+  document.querySelectorAll('.nav-links button').forEach(b=>b.classList.remove('active'));
+  current = n;
+  document.getElementById('s'+n).classList.add('active');
+  document.getElementById('nav'+n).classList.add('active');
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateProgress() {
+  document.getElementById('progress').style.width = (current/(TOTAL-1)*100)+'%';
+}
+
+// ===== MEMPOOL DEMO =====
+let mpStep = 0;
+const pool = document.getElementById('mempoolPool');
+
+function addNormalTx() {
+  pool.innerHTML = '';
+  const normals = [
+    {label:'Transfer 2 ETH', gas:45, cls:'tx-normal'},
+    {label:'Approve USDC', gas:38, cls:'tx-normal'},
+    {label:'Claim rewards', gas:52, cls:'tx-normal'},
+    {label:'Add liquidity', gas:70, cls:'tx-normal'},
+  ];
+  normals.forEach(t => {
+    pool.appendChild(makePill(t.label, t.gas, t.cls));
+  });
+  document.getElementById('btnAddVictim').disabled = false;
+  document.getElementById('btnAddNormal').disabled = true;
+  document.getElementById('mpStatus').innerHTML = 'Normal transactions added. Now add Alice\'s swap to see what the bot notices...';
+}
+
+function makePill(label, gas, cls) {
+  const p = document.createElement('div');
+  p.className = 'tx-pill ' + cls;
+  p.innerHTML = label + ' <span class="gas-badge">⛽'+gas+'</span>';
+  return p;
+}
+
+function addVictimTx() {
+  pool.appendChild(makePill('🔵 Alice: Swap 10 ETH→USDC (slip 1%)', 50, 'tx-victim'));
+  document.getElementById('btnBotDetect').disabled = false;
+  document.getElementById('btnAddVictim').disabled = true;
+  document.getElementById('mpStatus').innerHTML = '<span style="color:var(--blue)">Alice\'s swap is now visible to everyone in the mempool.</span> The bot is scanning...';
+}
+
+function botDetect() {
+  document.getElementById('mpStatus').innerHTML = '<span style="color:var(--accent2)">🤖 Bot detected Alice\'s swap! It calculates: 10 ETH × $2,000 × 1% slippage = up to $200 extractable. Inserting sandwich transactions with higher gas...</span>';
+  setTimeout(() => {
+    pool.appendChild(makePill('🔴 Bot FRONT: Buy ETH', 180, 'tx-attacker-front'));
+    pool.appendChild(makePill('🔴 Bot BACK: Sell ETH', 179, 'tx-attacker-back'));
+    document.getElementById('btnMineBlock').disabled = false;
+    document.getElementById('btnBotDetect').disabled = true;
+    document.getElementById('mpStatus').innerHTML = '<span style="color:var(--accent2)">Bot inserted two transactions. Now the validator assembles the block...</span>';
+  }, 900);
+}
+
+function mineBlock() {
+  pool.innerHTML = '<span style="color:var(--accent3);font-size:0.82rem;padding:0.5rem">✓ Block #21,837,401 confirmed — transactions ordered by gas price</span>';
+  document.getElementById('btnMineBlock').disabled = true;
+  document.getElementById('mpStatus').innerHTML = '<span style="color:var(--accent3)">Block mined! Bot\'s transactions (180 & 179 Gwei) came before Alice\'s (50 Gwei). Sandwich complete. Alice got ~$200 less than expected.</span>';
+}
+
+function resetMempool() {
+  pool.innerHTML = '<span style="color:var(--muted);font-size:0.78rem;padding:0.5rem">Mempool is empty — add transactions to begin</span>';
+  document.getElementById('btnAddNormal').disabled = false;
+  document.getElementById('btnAddVictim').disabled = true;
+  document.getElementById('btnBotDetect').disabled = true;
+  document.getElementById('btnMineBlock').disabled = true;
+  document.getElementById('mpStatus').innerHTML = 'Step 1: Add some normal transactions to populate the mempool.';
+}
+
+// ===== FRONTRUN SIMULATOR =====
+let frRunning = false;
+const logs = [
+  {delay:0, cls:'log-normal', msg:'[mempool] New tx: 0xAlice — mint NFT "CryptoPunk #9999" @ 1 ETH'},
+  {delay:600, cls:'log-normal', msg:'[mempool] Gas price: 50 Gwei · Nonce: 41 · From: 0xA1ice...'},
+  {delay:1100, cls:'log-detected', msg:'[bot] 🔍 Profitable opportunity detected!'},
+  {delay:1500, cls:'log-bot', msg:'[bot] NFT floor price = 3.00 ETH · Buy price = 1.00 ETH · Spread = 2.00 ETH'},
+  {delay:1900, cls:'log-bot', msg:'[bot] Calculating optimal gas... target gas = 180 Gwei (+130 over victim)'},
+  {delay:2300, cls:'log-bot', msg:'[bot] Submitting tx: 0xB0t — mint NFT "CryptoPunk #9999" @ 1 ETH · Gas: 180 Gwei'},
+  {delay:2800, cls:'log-included', msg:'[block] Block assembled · Bot tx position: #1 · Alice tx position: #2'},
+  {delay:3200, cls:'log-included', msg:'[block] ✓ Bot tx CONFIRMED — NFT minted to 0xB0t'},
+  {delay:3600, cls:'log-detected', msg:'[block] ✗ Alice tx FAILED — NFT already minted · Alice lost 0.005 ETH gas'},
+];
+
+async function runFrontrun() {
+  if (frRunning) return;
+  frRunning = true;
+  document.getElementById('btnFrontrun').disabled = true;
+  const stream = document.getElementById('txStream');
+  stream.innerHTML = '';
+  document.getElementById('frontrunBlock').style.display = 'none';
+  document.getElementById('frontrunResult').style.display = 'none';
+  document.querySelectorAll('.stage').forEach((s,i) => { s.className='stage'; });
+  document.querySelectorAll('#fr-tx1,#fr-tx2').forEach(t => t.classList.remove('show'));
+
+  for (let i=0; i<logs.length; i++) {
+    await sleep(logs[i].delay);
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    const now = new Date();
+    line.innerHTML = `<span class="log-time">${now.toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'})}.${String(now.getMilliseconds()).padStart(3,'0')}</span><span class="log-msg ${logs[i].cls}">${logs[i].msg}</span>`;
+    stream.appendChild(line);
+    stream.scrollTop = stream.scrollHeight;
+    activateStage(i);
+  }
+
+  await sleep(400);
+  document.getElementById('frontrunBlock').style.display = 'flex';
+  document.getElementById('frontrunBlock').style.flexDirection = 'column';
+  await sleep(200);
+  document.getElementById('fr-tx1').classList.add('show');
+  await sleep(400);
+  document.getElementById('fr-tx2').classList.add('show');
+  await sleep(400);
+  document.getElementById('frontrunResult').style.display = 'block';
+  document.getElementById('btnFrontrun').disabled = false;
+  frRunning = false;
+}
+
+function activateStage(logIdx) {
+  const map = {0:0,1:1,2:2,3:2,4:3,5:3,6:4,7:5,8:5};
+  const stageIdx = map[logIdx] ?? 0;
+  for (let i=0; i<6; i++) {
+    const s = document.getElementById('stage'+i);
+    if (i < stageIdx) s.className = 'stage done';
+    else if (i === stageIdx) s.className = 'stage active';
+    else s.className = 'stage';
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ===== SANDWICH SIMULATOR =====
+let swStep = 0;
+let slippage = 1.0;
+
+function updateSlippage(v) {
+  slippage = parseFloat(v);
+  document.getElementById('slipLabel').textContent = slippage.toFixed(1) + '%';
+  document.getElementById('slippagePct').textContent = slippage.toFixed(1) + '%';
+  const fairPrice = 2000;
+  const botBuy = 18000;
+  const priceImpact = (botBuy / 200000) * 100;
+  const priceAfterFront = fairPrice * (1 + priceImpact/100);
+  const bobPrice = fairPrice * (1 + priceImpact/100 * 0.8);
+  const bobOut = (10 * fairPrice * (1 - priceImpact/100 * 0.8)).toFixed(0);
+  const expectedOut = 10 * fairPrice;
+  const loss = (expectedOut - parseFloat(bobOut)).toFixed(0);
+  const profitPct = (slippage * 0.4).toFixed(2);
+  const profit = (parseFloat(profitPct) / 100 * expectedOut).toFixed(0);
+
+  document.getElementById('expectedOut').textContent = '$' + expectedOut.toLocaleString();
+  document.getElementById('minOut').textContent = '$' + (expectedOut * (1 - slippage/100)).toFixed(0).toLocaleString();
+  document.getElementById('botBuyAmt').textContent = '$' + (12000 + slippage * 1200).toFixed(0).toLocaleString();
+  document.getElementById('priceAfterFront').textContent = '$' + (fairPrice * (1 + slippage * 0.009)).toFixed(0);
+  document.getElementById('bobActualPrice').textContent = '$' + (fairPrice * (1 + slippage * 0.007)).toFixed(0);
+  const actualOut = (expectedOut * (1 - slippage * 0.004)).toFixed(0);
+  document.getElementById('bobActualOut').textContent = '$' + parseFloat(actualOut).toLocaleString();
+  const botP = (expectedOut - parseFloat(actualOut) - 25).toFixed(0);
+  document.getElementById('botProfit').textContent = '~$' + Math.max(0, botP).toLocaleString();
+  document.getElementById('r-expected').textContent = '$' + expectedOut.toLocaleString();
+  document.getElementById('r-actual').textContent = '$' + parseFloat(actualOut).toLocaleString();
+  const lossAmt = (expectedOut - parseFloat(actualOut)).toFixed(0);
+  document.getElementById('r-loss').textContent = '-$' + Math.abs(parseFloat(lossAmt)).toLocaleString() + ' USDC';
+  document.getElementById('r-profit').textContent = '+$' + Math.max(0, botP).toLocaleString() + ' USDC';
+  document.getElementById('sw-tx2-d').innerHTML = `<strong>Bob's SWAP</strong> — 10 ETH → USDC · Gas: 50 Gwei · Slippage ${slippage.toFixed(1)}%`;
+}
+
+async function runSandwich() {
+  const txs = ['sw-tx1','sw-tx2','sw-tx3'];
+  const labels = [
+    '⚡ Step 1: Bot\'s buy transaction enters the block first (gas 200 Gwei > Bob\'s 50 Gwei). ETH price rises in the pool.',
+    '😢 Step 2: Bob\'s swap executes at the now-worsened price. He receives fewer USDC than expected.',
+    '🤖 Step 3: Bot immediately sells the ETH it bought — at the higher price Bob helped create. Profit secured!'
+  ];
+  txs.forEach(id => { document.getElementById(id).style.opacity = '0.2'; });
+  document.getElementById('sandwichFinalResult').classList.remove('show');
+  document.getElementById('sandwichStepLabel').textContent = '';
+
+  for (let i=0; i<txs.length; i++) {
+    await sleep(i===0?300:700);
+    document.getElementById(txs[i]).style.opacity = '1';
+    document.getElementById(txs[i]).classList.add('show');
+    document.getElementById('sandwichStepLabel').textContent = labels[i];
+  }
+  await sleep(600);
+  document.getElementById('sandwichFinalResult').classList.add('show');
+}
+
+function resetSandwich() {
+  ['sw-tx1','sw-tx2','sw-tx3'].forEach(id => {
+    document.getElementById(id).style.opacity = '0.3';
+    document.getElementById(id).classList.remove('show');
+  });
+  document.getElementById('sandwichFinalResult').classList.remove('show');
+  document.getElementById('sandwichStepLabel').textContent = '';
+}
+
+// ===== ARB CALCULATOR =====
+let uniP = 2000, sushiP = 2000;
+function updateArb(dex, val) {
+  val = parseInt(val);
+  if (dex==='uni') { uniP = val; document.getElementById('uniPrice').textContent = '$'+val.toLocaleString(); }
+  else { sushiP = val; document.getElementById('sushiPrice').textContent = '$'+val.toLocaleString(); }
+
+  const uniEl = document.getElementById('uniPrice');
+  const sushiEl = document.getElementById('sushiPrice');
+  uniEl.className = 'price-big';
+  sushiEl.className = 'price-big';
+
+  const spread = Math.abs(uniP - sushiP);
+  const spreadPct = (spread / Math.min(uniP, sushiP) * 100).toFixed(2);
+  const tradeSize = 100; // ETH
+  const buyDex = uniP < sushiP ? 'Uniswap' : 'SushiSwap';
+  const sellDex = uniP > sushiP ? 'Uniswap' : 'SushiSwap';
+  const gross = (spread * tradeSize).toFixed(0);
+  const gas = 85;
+  const net = (parseFloat(gross) - gas).toFixed(0);
+
+  document.getElementById('arbSpread').textContent = '$'+spread.toFixed(2)+' ('+spreadPct+'%)';
+
+  if (spread > 5) {
+    uniEl.className = uniP > sushiP ? 'price-big higher' : 'price-big lower';
+    sushiEl.className = sushiP > uniP ? 'price-big higher' : 'price-big lower';
+    document.getElementById('arbTitle').textContent = '✅ Opportunity Found — Buy on '+buyDex+', Sell on '+sellDex;
+    document.getElementById('arbTitle').style.color = 'var(--accent3)';
+    document.getElementById('arbTradeSize').textContent = tradeSize+' ETH';
+    document.getElementById('arbProfit').textContent = '$'+parseFloat(gross).toLocaleString();
+    document.getElementById('arbGas').textContent = '~$'+gas+' (flash loan + 2 swaps)';
+    const netNum = parseFloat(net);
+    document.getElementById('arbNet').textContent = (netNum>0?'+':'')+'$'+netNum.toLocaleString();
+    document.getElementById('arbNet').style.color = netNum>0?'var(--accent3)':'var(--accent2)';
+  } else {
+    document.getElementById('arbTitle').textContent = 'No Profitable Opportunity (spread < $5)';
+    document.getElementById('arbTitle').style.color = 'var(--muted)';
+    document.getElementById('arbTradeSize').textContent = '—';
+    document.getElementById('arbProfit').textContent = '—';
+    document.getElementById('arbGas').textContent = '—';
+    document.getElementById('arbNet').textContent = '—';
+    document.getElementById('arbNet').style.color = '';
+  }
+}
+
+// ===== QUIZ =====
+let score = 0, answered = {};
+const qIds = ['q1','q2','q3','q4','q5','q6'];
+
+function ansQ(btn, correct, qId, explanation) {
+  if (answered[qId]) return;
+  answered[qId] = true;
+  btn.closest('.quiz-options').querySelectorAll('.quiz-opt').forEach(o=>{o.disabled=true;o.style.cursor='default';});
+  const fb = document.getElementById('fb-'+qId);
+  if (correct) { btn.classList.add('correct'); score++; fb.className='quiz-feedback correct show'; fb.textContent='✓ '+explanation; }
+  else { btn.classList.add('wrong'); fb.className='quiz-feedback wrong show'; fb.textContent='✗ '+explanation; }
+  if (Object.keys(answered).length === qIds.length) setTimeout(showScore, 600);
+}
+
+function showScore() {
+  const box = document.getElementById('scoreBox');
+  document.getElementById('scoreNum').textContent = score+'/6';
+  box.classList.add('show');
+  let msg, sub;
+  if (score===6) { msg='🏆 Perfect!'; sub='You understand MEV deeply. You\'re ready for advanced DeFi security concepts.'; }
+  else if (score>=4) { msg='🎉 Great!'; sub='Strong grasp of MEV. Review the sections you got wrong.'; }
+  else if (score>=2) { msg='📚 Keep Going'; sub='Re-read the simulator sections — the interactive demos should help it click.'; }
+  else { msg='🔁 Try Again'; sub='MEV is complex — go through each demo section and retry.'; }
+  document.getElementById('scoreMsg').textContent = msg;
+  document.getElementById('scoreSubMsg').textContent = sub;
+  box.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function restartQuiz() {
+  score = 0; answered = {};
+  qIds.forEach(qId => {
+    document.querySelectorAll('#'+qId+' .quiz-opt').forEach(o=>{o.disabled=false;o.classList.remove('correct','wrong');o.style.cursor='';});
+    const fb = document.getElementById('fb-'+qId);
+    fb.className='quiz-feedback'; fb.textContent='';
+  });
+  document.getElementById('scoreBox').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+updateProgress();
+updateSlippage(1.0);
+updateArb('uni',2000);
+</script>
+</body>
+</html>
