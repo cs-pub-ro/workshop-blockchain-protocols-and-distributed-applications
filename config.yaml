@@ -86,6 +86,7 @@ docusaurus:
               subsections:
                 - Standards: standards.md
                 - Fungible & NonFugible Tokens: fungible-non-fungible.md
+                - Ethereum Testnet Fungible Token: mint_tokens_testnet_eth.md
                 - Ethereum Fungible Token: mint_tokens_eth.md
                 - MultiversX Fungible Token: fungible.md
                 - MultiversX NFT: non-fungible.md
