@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blockchain Oracles — Interactive Learning</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d2e;
+    --surface2: #252842;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #e8eaf6;
+    --muted: #8892b0;
+    --border: #2d3154;
+    --card-bg: #1e2138;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== NAVIGATION ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(15,17,23,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .nav-logo {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+  }
+
+  .nav-links button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .nav-links button:hover,
+  .nav-links button.active {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  .nav-links button.active {
+    color: var(--accent);
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-bar {
+    position: fixed;
+    top: 60px; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.4s ease;
+    z-index: 99;
+  }
+
+  /* ===== MAIN ===== */
+  main {
+    padding-top: 80px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-bottom: 80px;
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .section.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent);
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+
+  .hero-start {
+    background: linear-gradient(135deg, var(--accent), #8b80ff);
+    border: none;
+    color: white;
+    padding: 0.9rem 2.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 24px rgba(108,99,255,0.35);
+  }
+
+  .hero-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(108,99,255,0.5);
+  }
+
+  /* ===== SECTION HEADER ===== */
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  .section-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .section-header p {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 700px;
+  }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+  }
+
+  .card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card p {
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  @media (max-width: 600px) {
+    .card-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 2rem; }
+    nav { padding: 0 1rem; }
+    .nav-links button { font-size: 0.75rem; padding: 0.35rem 0.6rem; }
+  }
+
+  /* ===== ANALOGY BOX ===== */
+  .analogy {
+    background: linear-gradient(135deg, rgba(108,99,255,0.1), rgba(255,101,132,0.1));
+    border: 1px solid rgba(108,99,255,0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    position: relative;
+  }
+
+  .analogy::before {
+    content: '💡 Real-World Analogy';
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .analogy p {
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+
+  /* ===== FLOW DIAGRAM ===== */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 2rem 0;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .flow-step {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    min-width: 130px;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .flow-step:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  .flow-step .step-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+
+  .flow-step .step-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .flow-step .step-sub {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+
+  .flow-arrow {
+    color: var(--accent);
+    font-size: 1.4rem;
+    padding: 0 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .flow-step-detail {
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    display: none;
+    text-align: left;
+    line-height: 1.5;
+  }
+
+  .flow-step.expanded .flow-step-detail { display: block; }
+  .flow-step.expanded { border-color: var(--accent); }
+
+  /* ===== ORACLE TYPES TABS ===== */
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .tab-btn:hover { border-color: var(--accent); color: var(--text); }
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  /* ===== EXAMPLES CARDS ===== */
+  .example-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+  }
+
+  .example-icon {
+    font-size: 2.4rem;
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    background: var(--surface2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .example-content h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .example-content p {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .tag {
+    display: inline-block;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent);
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    margin-right: 0.25rem;
+  }
+
+  .tag.green {
+    background: rgba(67,233,123,0.12);
+    border-color: rgba(67,233,123,0.3);
+    color: var(--accent3);
+  }
+
+  .tag.red {
+    background: rgba(255,101,132,0.12);
+    border-color: rgba(255,101,132,0.3);
+    color: var(--accent2);
+  }
+
+  /* ===== RISK HIGHLIGHT ===== */
+  .risk-box {
+    background: rgba(255,101,132,0.08);
+    border: 1px solid rgba(255,101,132,0.25);
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .risk-box h4 {
+    color: var(--accent2);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+  }
+
+  .risk-box p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  /* ===== QUIZ ===== */
+  .quiz-q {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .quiz-q h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .quiz-q .q-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .quiz-opt {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text);
+    text-align: left;
+    transition: all 0.2s;
+    line-height: 1.4;
+  }
+
+  .quiz-opt:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+
+  .quiz-opt.correct {
+    border-color: var(--accent3);
+    background: rgba(67,233,123,0.1);
+    color: var(--accent3);
+  }
+
+  .quiz-opt.wrong {
+    border-color: var(--accent2);
+    background: rgba(255,101,132,0.1);
+    color: var(--accent2);
+  }
+
+  .quiz-feedback {
+    margin-top: 0.8rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    display: none;
+  }
+
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct {
+    background: rgba(67,233,123,0.08);
+    color: var(--accent3);
+    border: 1px solid rgba(67,233,123,0.2);
+  }
+
+  .quiz-feedback.wrong {
+    background: rgba(255,101,132,0.08);
+    color: var(--accent2);
+    border: 1px solid rgba(255,101,132,0.2);
+  }
+
+  /* ===== SCORE ===== */
+  .score-box {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(108,99,255,0.15), rgba(67,233,123,0.1));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-top: 1rem;
+    display: none;
+  }
+
+  .score-box.show { display: block; animation: fadeIn 0.5s ease; }
+
+  .score-num {
+    font-size: 4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .score-label {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .score-msg {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ===== NAV BUTTONS ===== */
+  .nav-btns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2.5rem;
+    gap: 1rem;
+  }
+
+  .btn-prev, .btn-next {
+    padding: 0.75rem 1.8rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .btn-prev {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-prev:hover { border-color: var(--accent); }
+
+  .btn-next {
+    background: linear-gradient(135deg, var(--accent), #8b80ff);
+    color: white;
+    box-shadow: 0 4px 16px rgba(108,99,255,0.3);
+    margin-left: auto;
+  }
+
+  .btn-next:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(108,99,255,0.45);
+  }
+
+  /* ===== CHAINLINK ===== */
+  .chainlink-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.5rem 0;
+  }
+
+  .cl-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .cl-step:hover { border-color: var(--accent); }
+
+  .cl-num {
+    background: var(--accent);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .cl-content h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.2rem; }
+  .cl-content p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+  /* ===== COMPARISON TABLE ===== */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 1.5rem 0;
+  }
+
+  .compare-table th {
+    background: var(--surface2);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .compare-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table tr:hover td { background: rgba(108,99,255,0.05); }
+
+  /* ===== SUMMARY CHECKLIST ===== */
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 1.5rem 0;
+  }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.92rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .checklist li::before {
+    content: '✓';
+    color: var(--accent3);
+    font-weight: 900;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ===== TOOLTIP ===== */
+  .tooltip-wrap { position: relative; display: inline-block; }
+  .tooltip-wrap .tt {
+    position: absolute;
+    bottom: 125%; left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 10;
+    line-height: 1.4;
+    max-width: 220px;
+    white-space: normal;
+    text-align: center;
+  }
+  .tooltip-wrap:hover .tt { opacity: 1; }
+
+  /* ===== HIGHLIGHT ===== */
+  .hl { color: var(--accent); font-weight: 700; }
+  .hl2 { color: var(--accent3); font-weight: 700; }
+  .hl3 { color: var(--accent2); font-weight: 700; }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  /* ===== INTERACTIVE PRICE FEED DEMO ===== */
+  .demo-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .demo-box h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .price-display {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-align: center;
+    margin: 1rem 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .source-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem;
+    text-align: center;
+    font-size: 0.75rem;
+  }
+
+  .source-node .s-price {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 0.2rem;
+  }
+
+  .source-node .s-name { color: var(--muted); }
+
+  .btn-demo {
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 0.6rem 1.4rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: block;
+    margin: 0 auto;
+    transition: all 0.2s;
+  }
+
+  .btn-demo:hover { background: var(--accent); color: white; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">⛓️ Oracle Module</div>
+  <ul class="nav-links">
+    <li><button onclick="goTo(0)" id="nav0" class="active">Intro</button></li>
+    <li><button onclick="goTo(1)" id="nav1">The Problem</button></li>
+    <li><button onclick="goTo(2)" id="nav2">How It Works</button></li>
+    <li><button onclick="goTo(3)" id="nav3">Types</button></li>
+    <li><button onclick="goTo(4)" id="nav4">Examples</button></li>
+    <li><button onclick="goTo(5)" id="nav5">Risks</button></li>
+    <li><button onclick="goTo(6)" id="nav6">Quiz</button></li>
+  </ul>
+</nav>
+<div class="progress-bar" id="progress"></div>
+
+<main>
+
+<!-- ===== 0. INTRO ===== -->
+<section class="section active" id="s0">
+  <div class="hero">
+    <div class="hero-badge">🎓 Blockchain Workshop — Session 2</div>
+    <h1>Blockchain Oracles</h1>
+    <p>Blockchains are powerful — but they're completely blind to the outside world. <strong>Oracles</strong> are the bridge that connects on-chain smart contracts to real-world data, unlocking a new universe of financial applications.</p>
+    <button class="hero-start" onclick="goTo(1)">Start Learning →</button>
+  </div>
+
+  <div class="card-grid" style="margin-top:2rem">
+    <div class="card">
+      <h3>⏱️ Time Required</h3>
+      <p>~25 minutes to go through all sections, plus interactive quiz at the end.</p>
+    </div>
+    <div class="card">
+      <h3>🎯 What You'll Learn</h3>
+      <p>Why oracles exist, how they work, their types, real-world uses, and their limitations.</p>
+    </div>
+    <div class="card">
+      <h3>💡 No Code Required</h3>
+      <p>All concepts are explained with economic and real-world analogies — no programming background needed.</p>
+    </div>
+    <div class="card">
+      <h3>🏆 Quiz at the End</h3>
+      <p>Test your understanding with 6 interactive questions and get instant feedback.</p>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-next" onclick="goTo(1)">The Oracle Problem →</button>
+  </div>
+</section>
+
+<!-- ===== 1. THE PROBLEM ===== -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <div class="section-number">01 / 06 — The Problem</div>
+    <h2>Why Blockchains Are "Blind"</h2>
+    <p>To understand oracles, we first need to understand a fundamental limitation of blockchains — they cannot access anything outside their own network.</p>
+  </div>
+
+  <div class="card">
+    <h3>🔒 The Blockchain Isolation Rule</h3>
+    <p>A blockchain is a <span class="hl">deterministic, closed system</span>. Every node in the network must be able to reproduce the exact same result when executing a smart contract. If a contract could fetch data from the internet, different nodes might get different results — breaking consensus.</p>
+  </div>
+
+  <div class="analogy">
+    <p>Imagine a <span class="hl">judge in a courtroom</span> who can <em>only</em> consider evidence that has been officially submitted into the record — no Googling, no phone calls, no looking out the window. A smart contract is that judge. It can only process data that's already on the blockchain. Without a formal process to "submit" external information, the contract is blind.</p>
+  </div>
+
+  <div class="card">
+    <h3>📉 Why This Is a Big Problem for Finance</h3>
+    <p>Most real-world financial contracts depend on external data: stock prices, interest rates, exchange rates, commodity prices, weather events. Without a way to bring this data on-chain, smart contracts can only do basic token transfers — they can't power the sophisticated financial instruments that DeFi promises.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>❌ Without Oracles</h3>
+      <p style="color:var(--accent2)">A smart contract cannot know: BTC/USD price · loan liquidation thresholds · flight delays · election results · sports scores · real-world asset values</p>
+    </div>
+    <div class="card">
+      <h3>✅ With Oracles</h3>
+      <p style="color:var(--accent3)">Smart contracts can power: decentralized derivatives · algorithmic stablecoins · parametric insurance · prediction markets · cross-chain lending</p>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(0)">← Back</button>
+    <button class="btn-next" onclick="goTo(2)">How It Works →</button>
+  </div>
+</section>
+
+<!-- ===== 2. HOW IT WORKS ===== -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <div class="section-number">02 / 06 — How It Works</div>
+    <h2>The Oracle Mechanism</h2>
+    <p>An oracle is a service that retrieves data from the outside world and delivers it to the blockchain in a trustworthy way. Click each step to learn more.</p>
+  </div>
+
+  <div class="flow" id="oracleFlow">
+    <div class="flow-step" onclick="expandStep(this, 'A smart contract is running — for example, a DeFi lending protocol. It needs the current ETH/USD price to decide whether to liquidate a loan.')">
+      <span class="step-icon">📝</span>
+      <div class="step-label">Smart Contract</div>
+      <div class="step-sub">needs data</div>
+      <div class="flow-step-detail"></div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="expandStep(this, 'The contract emits a data request event on the blockchain. This is like posting a job listing: \"I need the ETH/USD price, and I will pay X LINK tokens for it.\"')">
+      <span class="step-icon">📡</span>
+      <div class="step-label">On-Chain Request</div>
+      <div class="step-sub">event emitted</div>
+      <div class="flow-step-detail"></div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="expandStep(this, 'Oracle nodes (run by independent operators) detect the request. Each node fetches data from one or more external APIs — exchanges, data providers, etc.')">
+      <span class="step-icon">🔍</span>
+      <div class="step-label">Oracle Nodes</div>
+      <div class="step-sub">fetch from APIs</div>
+      <div class="flow-step-detail"></div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="expandStep(this, 'Each node signs its answer cryptographically and submits it back to the blockchain. An aggregation contract collects all responses and computes a final value — usually the median — to filter out outliers.')">
+      <span class="step-icon">🤝</span>
+      <div class="step-label">Aggregation</div>
+      <div class="step-sub">consensus on value</div>
+      <div class="flow-step-detail"></div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" onclick="expandStep(this, 'The agreed-upon data is written on-chain. The original smart contract reads it and continues execution — e.g., it now knows ETH = $2,100 and decides not to liquidate the loan.')">
+      <span class="step-icon">✅</span>
+      <div class="step-label">On-Chain Answer</div>
+      <div class="step-sub">data delivered</div>
+      <div class="flow-step-detail"></div>
+    </div>
+  </div>
+
+  <p style="font-size:0.8rem; color:var(--muted); text-align:center; margin-top:-0.5rem; margin-bottom:1.5rem">👆 Click any step to see details</p>
+
+  <hr class="divider">
+
+  <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem">🔗 Chainlink: The Leading Oracle Network</h3>
+
+  <div class="chainlink-flow">
+    <div class="cl-step">
+      <div class="cl-num">1</div>
+      <div class="cl-content">
+        <h4>Data Providers submit raw data</h4>
+        <p>Premium data providers (e.g. Kaiko, CoinGecko, Brave New Coin) send price data to oracle nodes. They are incentivized to be accurate — false data can be detected and they lose reputation.</p>
+      </div>
+    </div>
+    <div class="cl-step">
+      <div class="cl-num">2</div>
+      <div class="cl-content">
+        <h4>Decentralized Oracle Network (DON)</h4>
+        <p>Many independent node operators (geographically distributed, different infrastructure) each independently gather the data. This prevents any single point of failure.</p>
+      </div>
+    </div>
+    <div class="cl-step">
+      <div class="cl-num">3</div>
+      <div class="cl-content">
+        <h4>On-Chain Aggregation</h4>
+        <p>Answers are aggregated — typically via <strong>median</strong> — into a final value published to a "Price Feed" smart contract. The median is manipulation-resistant: you'd need to corrupt >50% of nodes to move it.</p>
+      </div>
+    </div>
+    <div class="cl-step">
+      <div class="cl-num">4</div>
+      <div class="cl-content">
+        <h4>Staking and Economic Incentives (LINK Token)</h4>
+        <p>Node operators stake <span class="hl">LINK tokens</span> as collateral. They earn fees for correct data delivery. If they misbehave, their stake is "slashed" (destroyed). This creates economic alignment: honesty is profitable, dishonesty is costly.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Demo -->
+  <div class="demo-box">
+    <h4>🎮 Live Demo — How Price Aggregation Works</h4>
+    <p style="font-size:0.82rem; color:var(--muted); margin-bottom:1rem">Each oracle node gets a slightly different price from different sources. The final reported price is the median — click to simulate a new price update.</p>
+
+    <div class="sources-grid" id="sourcesGrid">
+      <div class="source-node"><div class="s-name">Node A</div><div class="s-price" id="n0">—</div></div>
+      <div class="source-node"><div class="s-name">Node B</div><div class="s-price" id="n1">—</div></div>
+      <div class="source-node"><div class="s-name">Node C</div><div class="s-price" id="n2">—</div></div>
+      <div class="source-node"><div class="s-name">Node D</div><div class="s-price" id="n3">—</div></div>
+      <div class="source-node"><div class="s-name">Node E</div><div class="s-price" id="n4">—</div></div>
+    </div>
+
+    <div class="price-display" id="medianDisplay">$—</div>
+    <p style="text-align:center; font-size:0.75rem; color:var(--muted); margin-bottom:1rem">↑ Median (on-chain reported price)</p>
+
+    <button class="btn-demo" onclick="simulatePriceFeed()">🔄 Simulate Oracle Update</button>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(1)">← Back</button>
+    <button class="btn-next" onclick="goTo(3)">Oracle Types →</button>
+  </div>
+</section>
+
+<!-- ===== 3. TYPES ===== -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <div class="section-number">03 / 06 — Types</div>
+    <h2>Types of Oracles</h2>
+    <p>Oracles are classified in multiple ways — by direction, by trust model, and by data source. Understanding the differences helps you assess risk.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(this,'t-direction')">By Direction</button>
+    <button class="tab-btn" onclick="switchTab(this,'t-trust')">By Trust Model</button>
+    <button class="tab-btn" onclick="switchTab(this,'t-source')">By Data Source</button>
+  </div>
+
+  <!-- Direction -->
+  <div class="tab-panel active" id="t-direction">
+    <div class="card-grid">
+      <div class="card">
+        <h3>📥 Inbound Oracles</h3>
+        <p>Deliver <strong>external data → blockchain</strong>. The most common type. Example: pushing an ETH/USD price from APIs onto the blockchain so a lending protocol can use it.</p>
+        <span class="tag green">Most Common</span>
+      </div>
+      <div class="card">
+        <h3>📤 Outbound Oracles</h3>
+        <p>Send <strong>blockchain data → external systems</strong>. Example: a smart contract triggers a real-world bank payment or unlocks an IoT device when payment is confirmed on-chain.</p>
+        <span class="tag">Less Common</span>
+      </div>
+    </div>
+    <div class="analogy">
+      <p>Think of it like a <span class="hl">data embassy</span>. An inbound oracle is like an embassy receiving news from abroad and reporting it to the local government. An outbound oracle is the embassy sending instructions to foreign governments based on local laws.</p>
+    </div>
+  </div>
+
+  <!-- Trust -->
+  <div class="tab-panel" id="t-trust">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Aspect</th>
+          <th>Centralized Oracle</th>
+          <th>Decentralized Oracle</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Operated by</strong></td>
+          <td>One entity</td>
+          <td>Many independent nodes</td>
+        </tr>
+        <tr>
+          <td><strong>Speed</strong></td>
+          <td>Fast</td>
+          <td>Slightly slower (consensus needed)</td>
+        </tr>
+        <tr>
+          <td><strong>Trust required</strong></td>
+          <td>Full trust in operator</td>
+          <td>Only majority needs to be honest</td>
+        </tr>
+        <tr>
+          <td><strong>Single point of failure</strong></td>
+          <td>Yes — if operator lies or goes offline, protocol fails</td>
+          <td>No — individual nodes can fail or cheat without corrupting the result</td>
+        </tr>
+        <tr>
+          <td><strong>Used in DeFi</strong></td>
+          <td>Rare (high risk)</td>
+          <td>Standard (e.g. Chainlink)</td>
+        </tr>
+        <tr>
+          <td><strong>Cost</strong></td>
+          <td>Lower</td>
+          <td>Higher (paying multiple operators)</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="risk-box">
+      <h4>⚠️ The "Oracle Problem"</h4>
+      <p>A centralized oracle is a <strong>single point of failure</strong> that breaks the trustless nature of blockchain. If you trust one data provider, you've just re-introduced centralized counterparty risk — exactly what DeFi is supposed to eliminate.</p>
+    </div>
+  </div>
+
+  <!-- Source -->
+  <div class="tab-panel" id="t-source">
+    <div class="card">
+      <h3>💻 Software Oracles</h3>
+      <p>Retrieve data from digital sources: price APIs, news websites, financial data providers, weather APIs. The most common type in DeFi. They interact with online services via API calls.</p>
+      <span class="tag green">DeFi Standard</span>
+    </div>
+    <div class="card">
+      <h3>🔧 Hardware Oracles</h3>
+      <p>Connect physical-world sensors to the blockchain: RFID readers tracking physical assets, temperature sensors, cargo tracking devices, IoT devices. Enable supply chain and physical asset tokenization.</p>
+      <span class="tag">IoT & Supply Chain</span>
+    </div>
+    <div class="card">
+      <h3>🧮 Compute Oracles</h3>
+      <p>Perform off-chain computation too expensive to run on-chain (gas cost), then deliver the result. Example: running a complex risk model or machine-learning inference off-chain and submitting only the verified result.</p>
+      <span class="tag">Advanced DeFi</span>
+    </div>
+    <div class="card">
+      <h3>🔁 Cross-Chain Oracles</h3>
+      <p>Enable communication between different blockchains. They read state from Chain A and relay it to Chain B — enabling interoperability between Ethereum, Solana, Avalanche, etc.</p>
+      <span class="tag">Interoperability</span>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(2)">← Back</button>
+    <button class="btn-next" onclick="goTo(4)">Real Examples →</button>
+  </div>
+</section>
+
+<!-- ===== 4. EXAMPLES ===== -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <div class="section-number">04 / 06 — Real-World Examples</div>
+    <h2>Where Oracles Power Finance</h2>
+    <p>Oracles are the invisible infrastructure behind most DeFi protocols. Here are the most important use cases you should know.</p>
+  </div>
+
+  <div class="example-card">
+    <div class="example-icon">💱</div>
+    <div class="example-content">
+      <h3>DeFi Lending (Aave, Compound)</h3>
+      <p>Protocols like Aave let you borrow crypto by posting collateral. The oracle continuously reports asset prices. When your collateral value drops below a threshold, the protocol automatically liquidates your position — <em>no human intervention required</em>. Without an accurate oracle, the protocol could be drained by bad debt.</p>
+      <span class="tag green">Price Feeds</span>
+      <span class="tag">Chainlink</span>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-icon">💵</div>
+    <div class="example-content">
+      <h3>Stablecoins (DAI / MakerDAO)</h3>
+      <p>DAI is a decentralized stablecoin pegged to $1. To maintain the peg, MakerDAO's smart contracts need to know real-time prices of the collateral (ETH, WBTC, etc.). If the oracle reports wrong prices, the entire $5B+ system could collapse — as almost happened in the March 2020 "Black Thursday" crash.</p>
+      <span class="tag green">Price Feeds</span>
+      <span class="tag red">High Stakes</span>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-icon">☁️</div>
+    <div class="example-content">
+      <h3>Parametric Insurance</h3>
+      <p>Traditional insurance requires claims adjustment (slow, expensive). Parametric insurance uses verifiable data to trigger automatic payouts. Example: a smart contract pays farmers automatically when rainfall falls below a threshold, using oracle-fed weather data from trusted meteorological APIs.</p>
+      <span class="tag">Weather Data</span>
+      <span class="tag green">Automation</span>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-icon">✈️</div>
+    <div class="example-content">
+      <h3>Flight Delay Insurance (Etherisc)</h3>
+      <p>Buy flight delay coverage on-chain. The smart contract uses an oracle to check real flight status data. If your flight is delayed >45 minutes, the payout is automatic — no claim form, no call center, no disputes. Just code and verified data.</p>
+      <span class="tag">Flight Data</span>
+      <span class="tag green">Instant Payout</span>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-icon">📊</div>
+    <div class="example-content">
+      <h3>Prediction Markets (Polymarket)</h3>
+      <p>Users bet on real-world outcomes: elections, sports results, economic data releases. An oracle (often a combination of APIs + human reporters) resolves markets by reporting the verified outcome. The smart contract then distributes winnings automatically.</p>
+      <span class="tag">Event Data</span>
+      <span class="tag">Polymarket</span>
+    </div>
+  </div>
+
+  <div class="example-card">
+    <div class="example-icon">🏦</div>
+    <div class="example-content">
+      <h3>On-Chain Derivatives (dYdX, Synthetix)</h3>
+      <p>Perpetual futures and synthetic assets require continuous price feeds. A synthetic "gold" token on Synthetix tracks the gold price via an oracle. Traders get gold exposure without custody risk, and the oracle is what keeps the synthetic price pegged to reality.</p>
+      <span class="tag green">Price Feeds</span>
+      <span class="tag">Derivatives</span>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(3)">← Back</button>
+    <button class="btn-next" onclick="goTo(5)">Risks & Limits →</button>
+  </div>
+</section>
+
+<!-- ===== 5. RISKS ===== -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <div class="section-number">05 / 06 — Risks & Limitations</div>
+    <h2>What Can Go Wrong?</h2>
+    <p>Oracles are powerful — but they're also the most exploited attack vector in DeFi. Understanding risks is essential for evaluating any protocol.</p>
+  </div>
+
+  <div class="risk-box">
+    <h4>🎯 Oracle Manipulation Attacks</h4>
+    <p>An attacker manipulates an oracle's price feed (e.g. by executing huge trades on a thinly-traded DEX) to artificially inflate or deflate an asset's price. The smart contract, trusting the oracle, then takes actions based on false data — allowing the attacker to borrow more than they should, or trigger false liquidations. This has caused <strong>hundreds of millions in losses</strong>.</p>
+  </div>
+
+  <div class="card">
+    <h3>📖 Case Study — The bZx Attack (Feb 2020)</h3>
+    <p>The bZx lending protocol used the price from a <em>single DEX</em> (Uniswap) as its oracle. An attacker used a flash loan to temporarily crash the price of a token on that DEX, borrowed at the manipulated price, repaid the flash loan, and walked away with <span class="hl3">$350,000 in profit</span> — all in one transaction. The fix: use time-weighted average prices (TWAPs) and multiple data sources.</p>
+  </div>
+
+  <div class="risk-box">
+    <h4>⏱️ Latency and Staleness</h4>
+    <p>Oracle data isn't real-time — it's updated at intervals (e.g. every heartbeat or when price moves >0.5%). During extreme market volatility, on-chain prices can lag real prices by minutes. During the March 2020 crash, stale oracle prices let users borrow against collateral that had already plummeted in value, resulting in bad debt for MakerDAO.</p>
+  </div>
+
+  <div class="risk-box">
+    <h4>🔗 Centralization Risk</h4>
+    <p>Even "decentralized" protocols sometimes rely on a small number of oracle nodes or a single data source. If those nodes collude, or a single data provider is hacked, the oracle reports false data — and every protocol using it is compromised simultaneously.</p>
+  </div>
+
+  <div class="risk-box">
+    <h4>💸 The "Last Mile" Problem</h4>
+    <p>An oracle can perfectly deliver data from the internet — but if the underlying <em>real-world event</em> is subjective or disputed (e.g., "did the hurricane cause enough damage for insurance?"), someone still has to make a judgment call. This introduces a human governance layer that can be corrupted or slow.</p>
+  </div>
+
+  <hr class="divider">
+
+  <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem">🛡️ Mitigations Used in Practice</h3>
+  <ul class="checklist">
+    <li><strong>Multiple independent data sources</strong> — aggregate across 10+ price providers; outliers are ignored</li>
+    <li><strong>Time-Weighted Average Prices (TWAPs)</strong> — average price over a window, making it expensive to manipulate momentarily</li>
+    <li><strong>Circuit breakers</strong> — smart contracts pause if oracle price moves >X% in a single block</li>
+    <li><strong>Decentralized node operators with economic stakes</strong> — nodes lose tokens if proven dishonest</li>
+    <li><strong>Dual oracle systems</strong> — use a secondary oracle to sanity-check the primary one</li>
+    <li><strong>On-chain price anchors</strong> — e.g., Chainlink + Uniswap TWAP as a cross-check</li>
+  </ul>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(4)">← Back</button>
+    <button class="btn-next" onclick="goTo(6)">Take the Quiz →</button>
+  </div>
+</section>
+
+<!-- ===== 6. QUIZ ===== -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <div class="section-number">06 / 06 — Quiz</div>
+    <h2>Test Your Knowledge 🧠</h2>
+    <p>Answer all questions to see your score. Click an answer to see immediate feedback.</p>
+  </div>
+
+  <!-- Q1 -->
+  <div class="quiz-q" id="q1">
+    <div class="q-num">Question 1 of 6</div>
+    <h3>Why can't a smart contract directly access the current price of Bitcoin from the internet?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this, false, 'q1', 'Incorrect. The limitation is not technical bandwidth — it\'s about determinism.')">A) Blockchains don't have enough bandwidth for internet requests</button>
+      <button class="quiz-opt" onclick="answer(this, true, 'q1', 'Correct! Blockchains must be deterministic: every node replays the same transactions and must get the exact same result. If contracts could fetch live data, nodes would get different answers at different times, breaking consensus.')">B) Smart contracts must be deterministic — different nodes might get different results at different times</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q1', 'Incorrect. Smart contracts can hold large data — that\'s not the issue.')">C) Smart contracts can only store a limited amount of data</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q1', 'Incorrect. Smart contracts can interact with anything on-chain — the limit is off-chain access.')">D) Smart contracts can only interact with their own code</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q1"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-q" id="q2">
+    <div class="q-num">Question 2 of 6</div>
+    <h3>In a decentralized oracle network like Chainlink, why is the <strong>median</strong> price used instead of the average?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this, false, 'q2', 'Incorrect. The median is not faster to compute than the mean.')">A) Median is faster to compute on-chain</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q2', 'Incorrect. The median is not inherently more accurate — it\'s more robust to manipulation.')">B) The median is always more accurate than the average</button>
+      <button class="quiz-opt" onclick="answer(this, true, 'q2', 'Correct! The median is resistant to extreme outliers. If one malicious oracle node reports $0 or $1,000,000, it barely moves the median — but it would significantly skew the mean. This makes manipulation much harder.')">C) The median is resistant to outliers — a single malicious node can't skew it significantly</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q2', 'Incorrect. There is no regulation requiring the use of median.')">D) Blockchain regulations require median aggregation</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q2"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-q" id="q3">
+    <div class="q-num">Question 3 of 6</div>
+    <h3>A DeFi lending protocol uses a single DEX as its price oracle. An attacker takes a flash loan and temporarily crashes a token's price on that DEX. What happens next?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this, false, 'q3', 'Incorrect. The blockchain automatically executes the rules in the smart contract — it cannot independently detect fraud.')">A) The blockchain detects the fraud and blocks the transaction</button>
+      <button class="quiz-opt" onclick="answer(this, true, 'q3', 'Correct! The protocol trusts the oracle. Since the oracle reports the manipulated price as real, the protocol acts on it. The attacker can now borrow far more than their collateral is actually worth, stealing funds before the price rebounds — all in one transaction.')">B) The protocol trusts the oracle's false price and allows the attacker to borrow more than their collateral is worth</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q3', 'Incorrect. Token prices on a DEX can be moved by large trades — that\'s exactly the vulnerability.')">C) DEX prices cannot be moved by a single actor</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q3', 'Incorrect. Flash loans must be repaid in the same transaction, but the profit is extracted before repayment.')">D) Flash loans must be repaid before the protocol can execute, so no harm is done</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q3"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-q" id="q4">
+    <div class="q-num">Question 4 of 6</div>
+    <h3>What is the key difference between an <strong>inbound</strong> and an <strong>outbound</strong> oracle?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this, true, 'q4', 'Correct! Inbound oracles bring external data INTO the blockchain. Outbound oracles send blockchain-originated triggers OUT to the real world — like unlocking an IoT device or initiating a bank transfer when a smart contract condition is met.')">A) Inbound: real-world data → blockchain; Outbound: blockchain event → real-world action</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q4', 'Incorrect — this is reversed. Inbound brings data in; outbound sends instructions out.')">B) Inbound: blockchain event → real world; Outbound: real-world data → blockchain</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q4', 'Incorrect. Both types can be software-based.')">C) Inbound oracles use hardware sensors; outbound oracles use software APIs</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q4', 'Incorrect. The distinction is direction of data flow, not centralization.')">D) Inbound oracles are centralized; outbound oracles are decentralized</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q4"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-q" id="q5">
+    <div class="q-num">Question 5 of 6</div>
+    <h3>Parametric insurance (like flight delay cover) is different from traditional insurance because:</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this, false, 'q5', 'Incorrect. Parametric insurance can be expensive to run if oracle infrastructure is costly.')">A) It is always cheaper than traditional insurance</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q5', 'Incorrect. It can cover all types of events, not only weather.')">B) It only covers weather-related events</button>
+      <button class="quiz-opt" onclick="answer(this, true, 'q5', 'Correct! Parametric insurance pays out automatically when a measurable trigger condition is met (e.g., flight delayed >45 min), verified by an oracle. No claim filing, no adjuster, no disputes. The oracle is what makes this trustless automation possible.')">C) Payouts are triggered automatically by verifiable oracle data — no claims process needed</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q5', 'Incorrect. Parametric insurance is fully on-chain — it requires no human adjuster.')">D) It requires a human adjuster to verify the oracle data before paying</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q5"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz-q" id="q6">
+    <div class="q-num">Question 6 of 6</div>
+    <h3>What does the LINK token do in the Chainlink ecosystem?</h3>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answer(this, false, 'q6', 'Incorrect. LINK is not a stablecoin — its price fluctuates.')">A) It is a stablecoin used to pay for gas fees on Ethereum</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q6', 'Incorrect. LINK does not govern price data directly — it aligns incentives.')">B) It represents ownership in the oracle data it reports</button>
+      <button class="quiz-opt" onclick="answer(this, false, 'q6', 'Incorrect. Chainlink is blockchain-agnostic — LINK is not an Ethereum validator token.')">C) It is used by Ethereum validators to confirm oracle transactions</button>
+      <button class="quiz-opt" onclick="answer(this, true, 'q6', 'Correct! LINK serves two purposes: (1) protocols pay oracle node operators in LINK for their data delivery service; (2) node operators stake LINK as collateral — if they behave dishonestly, their stake is slashed. This creates economic incentives for honest reporting.')">D) It pays node operators for data delivery and is staked as collateral — creating economic incentives for honest reporting</button>
+    </div>
+    <div class="quiz-feedback" id="fb-q6"></div>
+  </div>
+
+  <!-- Score -->
+  <div class="score-box" id="scoreBox">
+    <div class="score-num" id="scoreNum">0/6</div>
+    <div class="score-label">correct answers</div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <p id="scoreSubMsg" style="color:var(--muted);font-size:0.88rem;margin-top:0.3rem"></p>
+    <button onclick="restartQuiz()" style="margin-top:1.5rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:0.7rem 1.5rem;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:700">🔄 Retry Quiz</button>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goTo(5)">← Back</button>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ===== NAVIGATION =====
+let current = 0;
+const total = 7;
+
+function goTo(n) {
+  document.getElementById('s' + current).classList.remove('active');
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  current = n;
+  document.getElementById('s' + n).classList.add('active');
+  document.getElementById('nav' + n).classList.add('active');
+  updateProgress();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function updateProgress() {
+  const pct = ((current) / (total - 1)) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+// ===== FLOW STEPS =====
+function expandStep(el, text) {
+  const allSteps = document.querySelectorAll('.flow-step');
+  allSteps.forEach(s => {
+    if (s !== el) s.classList.remove('expanded');
+  });
+  el.classList.toggle('expanded');
+  if (el.classList.contains('expanded')) {
+    el.querySelector('.flow-step-detail').textContent = text;
+  }
+}
+
+// ===== TABS =====
+function switchTab(btn, panelId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ===== PRICE FEED DEMO =====
+let basePrice = 2100;
+
+function simulatePriceFeed() {
+  basePrice = 1800 + Math.round(Math.random() * 1000);
+  const prices = [];
+  for (let i = 0; i < 5; i++) {
+    const offset = Math.round((Math.random() - 0.5) * 80);
+    prices.push(basePrice + offset);
+  }
+  prices.forEach((p, i) => {
+    document.getElementById('n' + i).textContent = '$' + p.toLocaleString();
+  });
+  const sorted = [...prices].sort((a,b) => a-b);
+  const median = sorted[2];
+  document.getElementById('medianDisplay').textContent = '$' + median.toLocaleString();
+  document.getElementById('medianDisplay').style.color = 'var(--accent3)';
+  setTimeout(() => {
+    document.getElementById('medianDisplay').style.color = '';
+  }, 600);
+}
+
+simulatePriceFeed();
+
+// ===== QUIZ =====
+let score = 0;
+let answered = {};
+const questionIds = ['q1','q2','q3','q4','q5','q6'];
+
+function answer(btn, correct, qId, explanation) {
+  if (answered[qId]) return;
+  answered[qId] = true;
+
+  const opts = btn.closest('.quiz-options').querySelectorAll('.quiz-opt');
+  opts.forEach(o => { o.disabled = true; o.style.cursor = 'default'; });
+
+  const fb = document.getElementById('fb-' + qId);
+  if (correct) {
+    btn.classList.add('correct');
+    score++;
+    fb.className = 'quiz-feedback correct show';
+    fb.textContent = '✓ ' + explanation;
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'quiz-feedback wrong show';
+    fb.textContent = '✗ ' + explanation;
+  }
+
+  if (Object.keys(answered).length === questionIds.length) {
+    setTimeout(showScore, 600);
+  }
+}
+
+function showScore() {
+  const box = document.getElementById('scoreBox');
+  document.getElementById('scoreNum').textContent = score + '/6';
+  box.classList.add('show');
+
+  let msg, sub;
+  if (score === 6) {
+    msg = '🏆 Perfect Score!';
+    sub = 'You have mastered blockchain oracles. Ready for advanced DeFi concepts.';
+  } else if (score >= 4) {
+    msg = '🎉 Great Work!';
+    sub = 'Solid understanding. Review the sections where you got questions wrong.';
+  } else if (score >= 2) {
+    msg = '📚 Keep Reviewing';
+    sub = 'You\'re getting there. Go back through the sections and retry.';
+  } else {
+    msg = '🔁 Try Again';
+    sub = 'Don\'t worry — blockchain is complex. Read through each section again carefully.';
+  }
+
+  document.getElementById('scoreMsg').textContent = msg;
+  document.getElementById('scoreSubMsg').textContent = sub;
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function restartQuiz() {
+  score = 0;
+  answered = {};
+  questionIds.forEach(qId => {
+    const card = document.getElementById(qId);
+    card.querySelectorAll('.quiz-opt').forEach(o => {
+      o.disabled = false;
+      o.classList.remove('correct', 'wrong');
+      o.style.cursor = '';
+    });
+    const fb = document.getElementById('fb-' + qId);
+    fb.className = 'quiz-feedback';
+    fb.textContent = '';
+  });
+  document.getElementById('scoreBox').classList.remove('show');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+updateProgress();
+</script>
+</body>
+</html>
