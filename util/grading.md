@@ -12,18 +12,14 @@ Please check the [Challenges section](https://cs-pub-ro.github.io/workshop-block
 | Lend / Borrow tokens| 30p |
 | Overcollateralized Loan| 40p |
 | DeFiLlama | 5p |
-| MultiversX Tasks (Bonus) | 50p<sup>2</sup><sup>3</sup><sup>4</sup> |
+| MultiversX Tasks (Bonus) | 50p<sup>2</sup>|
 | **Total** | **180p** |
 | **Total with Bonus** | **230p** |
 
 <p><sup>1</sup> perform the tutorial here: https://cs-pub-ro.github.io/workshop-blockchain-protocols-and-distributed-applications/Practical%20Sessions/Tokens/mint_tokens_eth</p>
 
-<p><sup>2</sup> perform the wallet creation, token creation, liquidity pool, swaps on MultiversX Mainnet:</p>
+<p><sup>2</sup> perform the wallet creation, token creation, liquidity pool, swaps on MultiversX Devnet:</p>
 
-* https://wallet.multiversx.com/
-* https://explorer.multiversx.com/
-* https://xexchange.com/
-
-<p><sup>3</sup> If you want to perform this task we can send you some funds (EGLD) on mainnet.</p>
-
-<p><sup>4</sup> Same wallet works on Mainnet and Devnet.</p>
+* https://devnet-wallet.multiversx.com/
+* https://devnet-explorer.multiversx.com/
+* https://devnet.xexchange.com
