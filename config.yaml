@@ -150,45 +150,13 @@ docusaurus:
           #       - SC Events: events.md
           #     extra:
           #       - ../media/
-          - Challenges:
-              path: chapters/ctf/
-              subsections:
-                - Classroom Registration: workshop.md
-                - MultiversX Wallet: multiversx_wallet.md
-                # - Bump: bump.md
-                # - Coinflip: coinflip.md
-                # - GassPass: gaspass.md
-                # - Observer (Extra):
-                #     path: chapters/introduction/lab/content/observer/
-                #     extra:
-                #       - ../../media/
-                #       # - ../../quiz/
-                #     subsections:
-                #       - Observers: observer.md
-                # - Basic Peer-to-Peer Blockchain (Extra):
-                #     path: chapters/peer-to-peer/lab/content
-                #     subsections:
-                #       - What we will build? : what_we_build.md
-                #       - Why golang? : why_golang.md
-                #       - What is a discovery node ? : discovery_node.md
-                #       - Peer to Peer Network : p2p_network.md
-                #       - The terminal : terminal.md
-                #       - Mine a block : mining.md
-                #       - Basic Wallet : basic_wallet.md
-                #       - Transactions : transactions.md
-                #       - Sources : sources.md
-                #     extra:
-                #       - ../media/
-                # - Assignments:
-                # - Assignment 1: assignments/assignment1.md
-                # - Assignment 2: assignments/assignment2.md
-                # - Project: assignments/project.md
-                # - Blockchain Research Assignment: assignments/blockchain_research_assignment.md
-                # - Scientific Research Assignment: assignments/scientific_research_assignment.md
+      - Challenges:
+          path: chapters/ctf/
+          subsections:
+            - Tasks: workshop.md
+            - Bonus: multiversx_wallet.md
       - Grading: util/grading.md
       - Resources: util/resources.md
-    # static_assets:
-    #   - slides/Compute: /build/make_assets/content/chapters/introduction/lecture/_site
     config_meta:
       title: Blockchain Protocols and Distributed Applications
       url: http://costincarabas.github.io/
@@ -196,7 +164,5 @@ docusaurus:
       onBrokenLinks: warn
       onBrokenMarkdownLinks: warn
     config_socials:
-      Main site: https://ocw.cs.pub.ro/courses/fob
-      OCW: https://ocw.cs.pub.ro/courses/fob
-      Facebook: https://www.facebook.com/zuck/
-    copyright_string: Example Copyright
+      Main site: https://github.com/cs-pub-ro/workshop-blockchain-protocols-and-distributed-applications
+    copyright_string: (C) 2026 Costin Carabas, Bianca-Elena Ialangi, Sorin Petreasca
