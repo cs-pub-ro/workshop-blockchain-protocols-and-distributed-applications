@@ -106,7 +106,6 @@ docusaurus:
                 - Borrowing Assets: borrow_eth.md
                 # - Swap MultiversX Tokens: swap_mvx.md
                 # - MultiversX ESDT Tokens: mint_tokens_mvx.md
-                # - Ethereum Fungible Token: mint_tokens_eth.md
           - MultiversX Wallet (Optional):
               path: chapters/introduction/lab/content/wallet
               extra:
